@@ -21,11 +21,22 @@ function createVolIcon(available: boolean) {
   });
 }
 
+function isDark() {
+  return document.documentElement.classList.contains("dark");
+}
+
 export default function LiveMap() {
   const [needs, setNeeds] = useState<Need[]>([]);
   const [volunteers, setVolunteers] = useState<Volunteer[]>([]);
   const [filterOpen, setFilterOpen] = useState(false);
   const [matchModal, setMatchModal] = useState<{ open: boolean; matches: any[]; needDesc: string; needId: number }>({ open: false, matches: [], needDesc: "", needId: 0 });
+  const [dark, setDark] = useState(isDark());
+
+  useEffect(() => {
+    const observer = new MutationObserver(() => setDark(isDark()));
+    observer.observe(document.documentElement, { attributes: true, attributeFilter: ["class"] });
+    return () => observer.disconnect();
+  }, []);
 
   useEffect(() => {
     loadData();
@@ -47,31 +58,34 @@ export default function LiveMap() {
   const openNeeds = needs.filter(n => n.status === "open").length;
   const activeVols = volunteers.filter(v => v.is_available).length;
 
+  const tileUrl = dark
+    ? "https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
+    : "https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png";
+
+  const tileAttribution = '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>';
+
   return (
     <div className="relative" style={{ height: "calc(100vh - 56px)" }}>
-      {/* Map */}
       <MapContainer center={[20.5937, 78.9629]} zoom={5} style={{ height: "100%", width: "100%" }} zoomControl={true}>
-        <TileLayer attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors' url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
+        <TileLayer attribution={tileAttribution} url={tileUrl} />
 
-        {/* Need Markers */}
         {needs.filter(n => n.lat && n.lng).map(need => {
           const color = getUrgencyColor(need.urgency_score);
           const radius = 8 + (need.urgency_score * 12);
           return (
-            <CircleMarker key={`need-${need.id}`} center={[need.lat, need.lng]} radius={radius} pathOptions={{ color, fillColor: color, fillOpacity: 0.6, weight: 2 }}
-              >
+            <CircleMarker key={`need-${need.id}`} center={[need.lat, need.lng]} radius={radius} pathOptions={{ color, fillColor: color, fillOpacity: 0.6, weight: 2 }}>
               <Popup>
-                <div className="min-w-[220px]">
-                  <div className="flex items-center gap-2 mb-2">
-                    <span className="text-xs px-2 py-0.5 rounded-full font-medium" style={{ background: color + "20", color }}>{need.category}</span>
-                    <span className={`text-xs px-2 py-0.5 rounded-full ${need.status === "open" ? "badge-open" : need.status === "assigned" ? "badge-assigned" : "badge-completed"}`}>{need.status}</span>
+                <div style={{ minWidth: "240px" }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "10px" }}>
+                    <span style={{ fontSize: "11px", padding: "3px 10px", borderRadius: "999px", fontWeight: 600, background: color + "20", color }}>{need.category}</span>
+                    <span style={{ fontSize: "11px", padding: "3px 10px", borderRadius: "999px", background: need.status === "open" ? "#EF4444" : need.status === "assigned" ? "#F59E0B" : "#10B981", color: "white" }}>{need.status}</span>
                   </div>
-                  <p className="text-sm mb-2">{truncate(need.description, 100)}</p>
-                  <div className="text-xs text-sra-muted mb-1"><i className="bi bi-speedometer2 me-1"></i>Urgency: <strong>{need.urgency_score.toFixed(2)}</strong> ({getUrgencyLabel(need.urgency_score)})</div>
-                  <div className="text-xs text-sra-muted mb-2"><i className="bi bi-geo-alt me-1"></i>{need.location} • {need.zone}</div>
-                  <div className="flex gap-2">
-                    <button onClick={() => openMatchModal(need.id, need.description)} className="btn btn-sm btn-primary rounded-lg text-xs border-0" style={{ background: "#2563EB" }}><i className="bi bi-link-45deg me-1"></i>Match</button>
-                    <a href={`/chat/task_${need.id}`} className="btn btn-sm btn-outline-secondary rounded-lg text-xs"><i className="bi bi-chat me-1"></i>Chat</a>
+                  <p style={{ fontSize: "13px", margin: "0 0 8px 0", lineHeight: "1.5", color: "#334155" }}>{truncate(need.description, 100)}</p>
+                  <div style={{ fontSize: "12px", color: "#64748b", marginBottom: "4px" }}>⏱ Urgency: <strong>{need.urgency_score.toFixed(2)}</strong> ({getUrgencyLabel(need.urgency_score)})</div>
+                  <div style={{ fontSize: "12px", color: "#64748b", marginBottom: "12px" }}>📍 {need.location} • {need.zone}</div>
+                  <div style={{ display: "flex", gap: "8px" }}>
+                    <button onClick={() => openMatchModal(need.id, need.description)} style={{ fontSize: "12px", padding: "6px 14px", borderRadius: "10px", border: "none", background: "#2563EB", color: "white", cursor: "pointer", fontWeight: 500 }}>🔗 Match</button>
+                    <a href={`/chat/task_${need.id}`} style={{ fontSize: "12px", padding: "6px 14px", borderRadius: "10px", border: "1px solid #e2e8f0", background: "white", color: "#334155", textDecoration: "none", fontWeight: 500 }}>💬 Chat</a>
                   </div>
                 </div>
               </Popup>
@@ -79,20 +93,23 @@ export default function LiveMap() {
           );
         })}
 
-        {/* Volunteer Markers */}
         {volunteers.filter(v => v.lat && v.lng).map(vol => (
           <Marker key={`vol-${vol.id}`} position={[vol.lat, vol.lng]} icon={createVolIcon(vol.is_available)}>
             <Popup>
-              <div className="min-w-[200px]">
-                <div className="font-semibold text-sra-dark mb-1">{vol.name}</div>
-                <div className="flex items-center gap-1 mb-1">
-                  {Array.from({ length: 5 }).map((_, i) => <i key={i} className={`bi ${i < Math.floor(vol.rating) ? "bi-star-fill text-yellow-400" : "bi-star text-gray-300"} text-xs`}></i>)}
-                  <span className="text-xs text-sra-muted">{vol.rating}</span>
+              <div style={{ minWidth: "220px" }}>
+                <div style={{ fontWeight: 600, fontSize: "14px", marginBottom: "6px", color: "#1e293b" }}>{vol.name}</div>
+                <div style={{ display: "flex", alignItems: "center", gap: "2px", marginBottom: "8px" }}>
+                  {Array.from({ length: 5 }).map((_, i) => (
+                    <span key={i} style={{ color: i < Math.floor(vol.rating) ? "#F59E0B" : "#d1d5db", fontSize: "13px" }}>★</span>
+                  ))}
+                  <span style={{ fontSize: "12px", color: "#64748b", marginLeft: "4px" }}>{vol.rating}</span>
                 </div>
-                <div className="flex flex-wrap gap-1 mb-2">
-                  {vol.skills.map(s => <span key={s} className="text-[10px] bg-blue-50 text-blue-700 px-1.5 py-0.5 rounded">{s}</span>)}
+                <div style={{ display: "flex", flexWrap: "wrap", gap: "4px", marginBottom: "10px" }}>
+                  {vol.skills.map(s => (
+                    <span key={s} style={{ fontSize: "10px", background: "#eff6ff", color: "#2563eb", padding: "2px 8px", borderRadius: "6px" }}>{s}</span>
+                  ))}
                 </div>
-                <span className={`text-xs px-2 py-0.5 rounded-full ${vol.is_available ? "bg-green-100 text-green-700" : "bg-gray-100 text-gray-600"}`}>{vol.is_available ? "Available" : "On Task"}</span>
+                <span style={{ fontSize: "11px", padding: "3px 10px", borderRadius: "999px", background: vol.is_available ? "#dcfce7" : "#f1f5f9", color: vol.is_available ? "#166534" : "#475569" }}>{vol.is_available ? "Available" : "On Task"}</span>
               </div>
             </Popup>
           </Marker>
@@ -101,74 +118,95 @@ export default function LiveMap() {
 
       {/* Filter Panel */}
       <div className="map-panel map-filter-panel">
-        <button onClick={() => setFilterOpen(!filterOpen)} className="w-full flex items-center justify-between text-sm font-semibold text-sra-dark">
-          <span><i className="bi bi-funnel me-2"></i>Filters</span>
-          <i className={`bi ${filterOpen ? "bi-chevron-up" : "bi-chevron-down"}`}></i>
+        <button onClick={() => setFilterOpen(!filterOpen)} className="w-full flex items-center justify-between text-sm font-semibold" style={{ color: "var(--sra-text-primary)", background: "none", border: "none", cursor: "pointer" }}>
+          <span><i className="bi bi-funnel me-2" style={{ color: "#2563EB" }}></i>Filters</span>
+          <i className={`bi ${filterOpen ? "bi-chevron-up" : "bi-chevron-down"} transition-transform duration-200`}></i>
         </button>
         {filterOpen && (
-          <div className="mt-3 space-y-3 fade-in-up">
+          <div className="mt-4 space-y-4 fade-in-up">
             <div>
-              <label className="text-xs font-medium text-sra-muted mb-1 block">Category</label>
-              {["Medical", "Food", "Shelter", "Education", "Mental Health", "Construction"].map(cat => (
-                <label key={cat} className="flex items-center gap-2 text-sm py-0.5 cursor-pointer">
-                  <input type="checkbox" className="form-check-input" defaultChecked />{cat}
-                </label>
-              ))}
+              <label className="text-xs font-semibold uppercase tracking-wider mb-2 block" style={{ color: "var(--sra-text-secondary)" }}>Category</label>
+              <div className="space-y-1.5">
+                {["Medical", "Food", "Shelter", "Education", "Mental Health", "Construction"].map(cat => (
+                  <label key={cat} className="flex items-center gap-2.5 text-sm cursor-pointer py-0.5" style={{ color: "var(--sra-text-primary)" }}>
+                    <input type="checkbox" className="form-check-input" defaultChecked />{cat}
+                  </label>
+                ))}
+              </div>
             </div>
             <div>
-              <label className="text-xs font-medium text-sra-muted mb-1 block">Zone</label>
-              <select className="form-select form-select-sm rounded-xl border-sra-border">
+              <label className="text-xs font-semibold uppercase tracking-wider mb-2 block" style={{ color: "var(--sra-text-secondary)" }}>Zone</label>
+              <select className="form-select form-select-sm rounded-xl" style={{ borderColor: "var(--sra-border)" }}>
                 <option value="">All Zones</option>
                 <option>North Delhi</option><option>South Delhi</option><option>East Delhi</option><option>West Delhi</option><option>Central Delhi</option>
               </select>
             </div>
-            <button className="btn btn-sm bg-sra-primary text-white w-full rounded-xl border-0">Apply Filters</button>
+            <button className="btn btn-sm text-white w-full rounded-xl border-0 font-medium" style={{ background: "#2563EB" }}>
+              <i className="bi bi-funnel me-1"></i>Apply Filters
+            </button>
           </div>
         )}
       </div>
 
       {/* Legend */}
-      <div className="map-panel map-legend top-4 right-4">
-        <h6 className="text-xs font-semibold text-sra-dark mb-2">Legend</h6>
-        <div className="space-y-1.5 text-xs">
-          <div className="flex items-center gap-2"><span className="w-3.5 h-3.5 rounded-full inline-block" style={{ background: "#EF4444" }}></span>High Urgency (&gt;0.70)</div>
-          <div className="flex items-center gap-2"><span className="w-3.5 h-3.5 rounded-full inline-block" style={{ background: "#F59E0B" }}></span>Medium Urgency (0.40-0.70)</div>
-          <div className="flex items-center gap-2"><span className="w-3.5 h-3.5 rounded-full inline-block" style={{ background: "#10B981" }}></span>Low Urgency (&lt;0.40)</div>
-          <div className="flex items-center gap-2"><span className="w-3.5 h-3.5 rounded-full inline-block" style={{ background: "#2563EB" }}></span>Volunteer (Available)</div>
-          <div className="flex items-center gap-2"><span className="w-3.5 h-3.5 rounded-full inline-block" style={{ background: "#94A3B8" }}></span>Volunteer (On Task)</div>
+      <div className="map-panel map-legend">
+        <h6 className="text-xs font-bold uppercase tracking-wider mb-3" style={{ color: "var(--sra-text-primary)" }}>
+          <i className="bi bi-info-circle me-1.5" style={{ color: "#2563EB" }}></i>Legend
+        </h6>
+        <div className="space-y-2.5">
+          {[
+            { color: "#EF4444", label: "High Urgency (>0.70)" },
+            { color: "#F59E0B", label: "Medium Urgency (0.40-0.70)" },
+            { color: "#10B981", label: "Low Urgency (<0.40)" },
+            { color: "#2563EB", label: "Volunteer (Available)" },
+            { color: "#94A3B8", label: "Volunteer (On Task)" },
+          ].map(item => (
+            <div key={item.label} className="flex items-center gap-2.5 text-xs" style={{ color: "var(--sra-text-primary)" }}>
+              <span className="flex-shrink-0" style={{ width: "14px", height: "14px", borderRadius: "50%", background: item.color, display: "inline-block" }}></span>
+              {item.label}
+            </div>
+          ))}
         </div>
       </div>
 
       {/* Live Stats */}
-      <div className="map-panel bottom-8 right-4">
-        <div className="flex gap-6 text-xs">
-          <div><span className="text-sra-muted">Open Needs:</span> <strong className="text-sra-danger">{openNeeds}</strong></div>
-          <div><span className="text-sra-muted">Active Vols:</span> <strong className="text-sra-primary">{activeVols}</strong></div>
+      <div className="map-panel map-stats">
+        <div className="flex gap-6 text-xs font-medium">
+          <div>
+            <span style={{ color: "var(--sra-text-secondary)" }}>Open Needs:</span>{" "}
+            <strong style={{ color: "#EF4444", fontSize: "14px" }}>{openNeeds}</strong>
+          </div>
+          <div>
+            <span style={{ color: "var(--sra-text-secondary)" }}>Active Vols:</span>{" "}
+            <strong style={{ color: "#2563EB", fontSize: "14px" }}>{activeVols}</strong>
+          </div>
         </div>
       </div>
 
       {/* Match Modal */}
       {matchModal.open && (
-        <div className="fixed inset-0 bg-black/50 z-[1001] flex items-center justify-center p-4" onClick={() => setMatchModal(m => ({ ...m, open: false }))}>
-          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-2xl max-h-[80vh] overflow-y-auto fade-in-up" onClick={e => e.stopPropagation()}>
-            <div className="p-5 border-b border-sra-border flex items-center justify-between">
-              <h3 className="font-semibold text-sra-dark text-sm">Top Matches for "{matchModal.needDesc}"</h3>
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-[1001] flex items-center justify-center p-4" onClick={() => setMatchModal(m => ({ ...m, open: false }))}>
+          <div className="bg-white/95 backdrop-blur-xl rounded-2xl shadow-2xl w-full max-w-2xl max-h-[80vh] overflow-y-auto fade-in-up" onClick={e => e.stopPropagation()}>
+            <div className="p-5 border-b flex items-center justify-between">
+              <h3 className="font-semibold text-sm" style={{ color: "var(--sra-text-primary)" }}>Top Matches for &ldquo;{matchModal.needDesc}&rdquo;</h3>
               <button onClick={() => setMatchModal(m => ({ ...m, open: false }))} className="btn-close"></button>
             </div>
             <div className="p-5">
               {matchModal.matches.length > 0 ? matchModal.matches.map((m: any, i: number) => (
-                <div key={m.volunteer_id} className={`flex items-center gap-4 p-4 rounded-xl mb-3 border ${i === 0 ? "border-sra-primary bg-blue-50/30" : "border-sra-border"}`}>
+                <div key={m.volunteer_id} className={`flex items-center gap-4 p-4 rounded-xl mb-3 border transition-all duration-200 hover:shadow-md ${i === 0 ? "border-sra-primary bg-blue-50/30" : "border-sra-border hover:border-blue-200"}`}>
                   <div className={`w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm ${i === 0 ? "bg-sra-primary text-white" : "bg-slate-100 text-sra-muted"}`}>#{i + 1}</div>
                   <div className="flex-1">
-                    <div className="font-medium text-sra-dark text-sm">{m.name}</div>
-                    <div className="text-xs text-sra-muted mt-1">{m.distance_km} km • Skill: {m.skill_score} • Geo: {m.geo_score}</div>
+                    <div className="font-medium text-sm" style={{ color: "var(--sra-text-primary)" }}>{m.name}</div>
+                    <div className="text-xs mt-1" style={{ color: "var(--sra-text-secondary)" }}>{m.distance_km} km • Skill: {m.skill_score} • Geo: {m.geo_score}</div>
                   </div>
                   <div className="text-right">
                     <div className="text-lg font-bold text-sra-primary">{(m.final_score * 100).toFixed(0)}%</div>
-                    <button onClick={() => { setMatchModal(m => ({ ...m, open: false })); }} className="btn btn-sm bg-sra-primary text-white mt-1 rounded-xl border-0 px-3 text-xs"><i className="bi bi-check2 me-1"></i>Assign</button>
+                    <button onClick={() => setMatchModal(m => ({ ...m, open: false }))} className="btn btn-sm bg-sra-primary text-white mt-1 rounded-xl border-0 px-3 text-xs transition-all duration-200 hover:scale-105">
+                      <i className="bi bi-check2 me-1"></i>Assign
+                    </button>
                   </div>
                 </div>
-              )) : <div className="text-center py-8 text-sra-muted"><i className="bi bi-people text-3xl block mb-2 opacity-30"></i>No matching volunteers found</div>}
+              )) : <div className="text-center py-8" style={{ color: "var(--sra-text-secondary)" }}><i className="bi bi-people text-3xl block mb-2 opacity-30"></i>No matching volunteers found</div>}
             </div>
           </div>
         </div>

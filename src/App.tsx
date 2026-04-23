@@ -29,6 +29,13 @@ function App() {
       localStorage.removeItem("sra_name");
       localStorage.removeItem("sra_user_id");
     }
+    // Initialize dark mode
+    const theme = localStorage.getItem("sra_theme");
+    if (theme === "dark" || (!theme && window.matchMedia("(prefers-color-scheme: dark)").matches)) {
+      document.documentElement.classList.add("dark");
+    } else {
+      document.documentElement.classList.remove("dark");
+    }
   }, []);
 
   return (

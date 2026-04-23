@@ -48,7 +48,7 @@ export default function Landing() {
             <Link to="/register" className="inline-flex items-center justify-center gap-2 bg-white text-sra-primary font-semibold px-8 py-3.5 rounded-xl hover:bg-blue-50 transition-colors text-lg no-underline shadow-lg">
               <i className="bi bi-rocket-takeoff"></i>Get Started
             </Link>
-            <a href="#features" className="inline-flex items-center justify-center gap-2 border-2 border-white/30 text-white font-semibold px-8 py-3.5 rounded-xl hover:bg-white/10 transition-colors text-lg no-underline">
+            <a href="#features" onClick={e => { e.preventDefault(); document.getElementById("features")?.scrollIntoView({ behavior: "smooth", block: "start" }); }} className="inline-flex items-center justify-center gap-2 border-2 border-white/30 text-white font-semibold px-8 py-3.5 rounded-xl hover:bg-white/10 hover:border-white/50 transition-all duration-300 text-lg no-underline">
               <i className="bi bi-arrow-down-circle"></i>Learn More
             </a>
           </div>
