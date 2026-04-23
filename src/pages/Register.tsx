@@ -76,104 +76,168 @@ export default function Register() {
   };
 
   return (
-    <div className="min-h-screen bg-sra-light flex items-center justify-center p-4">
+    <div className="auth-page flex items-center justify-center p-4 py-8">
+      {/* Animated background bubbles */}
+      <div className="auth-bubble"></div>
+      <div className="auth-bubble"></div>
+      <div className="auth-bubble"></div>
+      <div className="auth-bubble"></div>
+      <div className="auth-bubble"></div>
+
       <div className="w-full max-w-[520px]">
-        <div className="sra-card shadow-lg">
+        <div className="auth-card p-8 sm:p-10">
           {/* Header */}
-          <div className="text-center pt-6 pb-2">
-            <div className="w-14 h-14 rounded-2xl bg-blue-50 text-sra-primary flex items-center justify-center mx-auto mb-3">
-              <i className="bi bi-person-plus-fill text-2xl"></i>
+          <div className="text-center mb-6">
+            <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-[#10B981] to-[#2563EB] flex items-center justify-center mx-auto mb-4 shadow-lg" style={{ animation: "pulseGlow 3s ease-in-out infinite" }}>
+              <i className="bi bi-person-plus-fill text-white text-2xl"></i>
             </div>
-            <h1 className="text-2xl font-bold text-sra-dark">Create Account</h1>
+            <h1 className="text-2xl font-bold text-sra-dark tracking-tight">Create Account</h1>
+            <p className="text-sra-muted text-sm mt-2">Join the platform making a real difference</p>
           </div>
 
           {/* Tabs */}
-          <div className="flex border-b border-sra-border mx-6">
-            <button onClick={() => setActiveTab("user")} className={`flex-1 py-3 text-center font-medium text-sm border-b-2 transition-colors flex items-center justify-center gap-2 ${activeTab === "user" ? "border-sra-primary text-sra-primary" : "border-transparent text-sra-muted hover:text-sra-dark"}`}>
+          <div className="sra-tabs mb-6">
+            <button onClick={() => setActiveTab("user")} className={`sra-tab ${activeTab === "user" ? "active" : ""}`}>
               <i className="bi bi-person"></i>Community Member
             </button>
-            <button onClick={() => setActiveTab("volunteer")} className={`flex-1 py-3 text-center font-medium text-sm border-b-2 transition-colors flex items-center justify-center gap-2 ${activeTab === "volunteer" ? "border-sra-primary text-sra-primary" : "border-transparent text-sra-muted hover:text-sra-dark"}`}>
-              <i className="bi bi-people"></i>Volunteer / Field Worker
+            <button onClick={() => setActiveTab("volunteer")} className={`sra-tab ${activeTab === "volunteer" ? "active" : ""}`}>
+              <i className="bi bi-people"></i>Volunteer
             </button>
           </div>
 
           {/* Error */}
           {error && (
-            <div className="mx-6 mt-4 bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-xl text-sm flex items-center gap-2 fade-in-up">
-              <i className="bi bi-exclamation-circle"></i>{error}
+            <div className="sra-error-box mb-5">
+              <i className="bi bi-exclamation-circle text-base"></i>
+              <span>{error}</span>
             </div>
           )}
 
           {/* Form */}
-          <form onSubmit={handleSubmit} className="p-6 space-y-3">
-            <div className="form-floating">
-              <input type="text" className="form-control rounded-xl border-sra-border" id="reg-name" placeholder="Full Name" value={form.name} onChange={e => updateField("name", e.target.value)} required />
-              <label htmlFor="reg-name">Full Name *</label>
+          <form onSubmit={handleSubmit}>
+            {/* Full Name */}
+            <div className="sra-input-group">
+              <label htmlFor="reg-name">Full Name</label>
+              <div className="sra-input-wrapper">
+                <i className="bi bi-person sra-input-icon"></i>
+                <input type="text" className="sra-input" id="reg-name" placeholder="John Doe" value={form.name} onChange={e => updateField("name", e.target.value)} required />
+              </div>
             </div>
-            <div className="form-floating">
-              <input type="email" className="form-control rounded-xl border-sra-border" id="reg-email" placeholder="Email" value={form.email} onChange={e => updateField("email", e.target.value)} required />
-              <label htmlFor="reg-email">Email Address *</label>
+
+            {/* Email */}
+            <div className="sra-input-group">
+              <label htmlFor="reg-email">Email Address</label>
+              <div className="sra-input-wrapper">
+                <i className="bi bi-envelope sra-input-icon"></i>
+                <input type="email" className="sra-input" id="reg-email" placeholder="you@example.com" value={form.email} onChange={e => updateField("email", e.target.value)} required />
+              </div>
             </div>
-            <div className="form-floating">
-              <input type="tel" className="form-control rounded-xl border-sra-border" id="reg-phone" placeholder="Phone" value={form.phone} onChange={e => updateField("phone", e.target.value)} required={activeTab === "volunteer"} />
-              <label htmlFor="reg-phone">Phone Number {activeTab === "volunteer" ? "*" : "(optional)"}</label>
+
+            {/* Phone */}
+            <div className="sra-input-group">
+              <label htmlFor="reg-phone">Phone Number {activeTab !== "volunteer" && <span className="text-sra-muted font-normal normal-case">(optional)</span>}</label>
+              <div className="sra-input-wrapper">
+                <i className="bi bi-phone sra-input-icon"></i>
+                <input type="tel" className="sra-input" id="reg-phone" placeholder="+91 98765 43210" value={form.phone} onChange={e => updateField("phone", e.target.value)} required={activeTab === "volunteer"} />
+              </div>
             </div>
-            <div className="form-floating">
-              <input type="password" className="form-control rounded-xl border-sra-border" id="reg-pass" placeholder="Password" value={form.password} onChange={e => updateField("password", e.target.value)} required minLength={8} />
-              <label htmlFor="reg-pass">Password * (min 8 characters)</label>
+
+            {/* Password */}
+            <div className="sra-input-group">
+              <label htmlFor="reg-pass">Password</label>
+              <div className="sra-input-wrapper">
+                <i className="bi bi-lock sra-input-icon"></i>
+                <input type="password" className="sra-input" id="reg-pass" placeholder="Minimum 8 characters" value={form.password} onChange={e => updateField("password", e.target.value)} required minLength={8} />
+              </div>
             </div>
-            <div className="form-floating">
-              <input type="password" className="form-control rounded-xl border-sra-border" id="reg-confirm" placeholder="Confirm" value={form.confirmPassword} onChange={e => updateField("confirmPassword", e.target.value)} required />
-              <label htmlFor="reg-confirm">Confirm Password *</label>
+
+            {/* Confirm Password */}
+            <div className="sra-input-group">
+              <label htmlFor="reg-confirm">Confirm Password</label>
+              <div className="sra-input-wrapper">
+                <i className="bi bi-lock-fill sra-input-icon"></i>
+                <input type="password" className="sra-input" id="reg-confirm" placeholder="Re-enter your password" value={form.confirmPassword} onChange={e => updateField("confirmPassword", e.target.value)} required />
+              </div>
             </div>
 
             {/* Volunteer-only fields */}
             {activeTab === "volunteer" && (
-              <div className="space-y-3 pt-2">
-                <div>
-                  <label className="text-xs font-medium uppercase tracking-wider text-sra-muted mb-2 block">Skills *</label>
-                  <div className="grid grid-cols-2 gap-2">
+              <div className="space-y-4 pt-2 border-t border-sra-border mt-2">
+                {/* Skills */}
+                <div className="sra-input-group" style={{ animationDelay: "0.45s" }}>
+                  <label>Skills & Expertise</label>
+                  <div className="grid grid-cols-2 gap-2 mt-1">
                     {SKILLS_LIST.map(skill => (
-                      <label key={skill} className={`flex items-center gap-2 p-2 rounded-lg border cursor-pointer text-sm transition-colors ${form.skills.includes(skill) ? "border-sra-primary bg-blue-50 text-sra-primary" : "border-sra-border text-sra-muted hover:border-sra-primary"}`}>
-                        <input type="checkbox" className="form-check-input m-0" checked={form.skills.includes(skill)} onChange={() => toggleSkill(skill)} />
-                        {skill}
-                      </label>
+                      <div key={skill} className={`skill-chip ${form.skills.includes(skill) ? "selected" : ""}`} onClick={() => toggleSkill(skill)}>
+                        <span className="chip-check"><i className="bi bi-check"></i></span>
+                        <span className="text-xs leading-tight">{skill}</span>
+                      </div>
                     ))}
                   </div>
                 </div>
-                <div className="form-floating">
-                  <input type="text" className="form-control rounded-xl border-sra-border" id="reg-zone" placeholder="Zone" value={form.zone} onChange={e => updateField("zone", e.target.value)} />
+
+                {/* Zone */}
+                <div className="sra-input-group" style={{ animationDelay: "0.5s" }}>
                   <label htmlFor="reg-zone">Zone / Area of Operation</label>
+                  <div className="sra-input-wrapper">
+                    <i className="bi bi-geo sra-input-icon"></i>
+                    <input type="text" className="sra-input" id="reg-zone" placeholder="e.g. North Delhi" value={form.zone} onChange={e => updateField("zone", e.target.value)} />
+                  </div>
                 </div>
-                <div>
-                  <label className="text-xs font-medium uppercase tracking-wider text-sra-muted mb-2 block">Current Location</label>
-                  <div className="flex gap-2">
-                    <div className="form-floating flex-1">
-                      <input type="text" className="form-control rounded-xl border-sra-border" id="reg-lat" placeholder="Latitude" value={form.lat} onChange={e => updateField("lat", e.target.value)} />
-                      <label htmlFor="reg-lat">Latitude</label>
+
+                {/* Location */}
+                <div className="sra-input-group" style={{ animationDelay: "0.55s" }}>
+                  <label>Current Location</label>
+                  <div className="flex gap-2 mt-1">
+                    <div className="flex-1">
+                      <div className="sra-input-wrapper">
+                        <i className="bi bi-crosshair sra-input-icon"></i>
+                        <input type="text" className="sra-input" placeholder="Latitude" value={form.lat} onChange={e => updateField("lat", e.target.value)} />
+                      </div>
                     </div>
-                    <div className="form-floating flex-1">
-                      <input type="text" className="form-control rounded-xl border-sra-border" id="reg-lng" placeholder="Longitude" value={form.lng} onChange={e => updateField("lng", e.target.value)} />
-                      <label htmlFor="reg-lng">Longitude</label>
+                    <div className="flex-1">
+                      <div className="sra-input-wrapper">
+                        <i className="bi bi-crosshair sra-input-icon"></i>
+                        <input type="text" className="sra-input" placeholder="Longitude" value={form.lng} onChange={e => updateField("lng", e.target.value)} />
+                      </div>
                     </div>
                   </div>
-                  <button type="button" onClick={getMyLocation} className="btn btn-sm btn-outline-primary mt-2 rounded-xl">
-                    <i className="bi bi-crosshair me-1"></i>Use My Location
+                  <button type="button" onClick={getMyLocation} className="mt-2 flex items-center gap-1.5 text-xs font-medium text-sra-primary hover:text-blue-700 bg-transparent border-0 cursor-pointer transition-colors">
+                    <i className="bi bi-geo-alt"></i>Use My Current Location
                   </button>
                 </div>
               </div>
             )}
 
-            <button type="submit" disabled={loading} className="w-full btn bg-sra-primary text-white py-3 rounded-xl font-semibold text-lg hover:opacity-90 transition-opacity flex items-center justify-center gap-2 border-0 mt-4">
-              {loading ? (<><span className="spinner-border spinner-border-sm" role="status"></span>Creating account...</>) : activeTab === "volunteer" ? (<><i className="bi bi-person-check"></i>Register as Volunteer</>) : (<><i className="bi bi-person-plus"></i>Create Account</>)}
-            </button>
+            {/* Submit */}
+            <div className="mt-6">
+              <button type="submit" disabled={loading} className="sra-btn-primary">
+                {loading ? (
+                  <><span className="spinner-border spinner-border-sm" role="status"></span>Creating account...</>
+                ) : activeTab === "volunteer" ? (
+                  <>Register as Volunteer <i className="bi bi-arrow-right"></i></>
+                ) : (
+                  <>Create Account <i className="bi bi-arrow-right"></i></>
+                )}
+              </button>
+            </div>
           </form>
 
-          <div className="text-center pb-6">
-            <span className="text-sra-muted text-sm">Already have an account? </span>
-            <a href="/login" className="text-sra-primary font-semibold text-sm no-underline hover:underline" onClick={e => { e.preventDefault(); navigate("/login"); }}>Sign in</a>
+          <div className="sra-divider">
+            <span>Already have an account?</span>
+          </div>
+
+          <div className="text-center">
+            <button onClick={() => navigate("/login")} className="inline-flex items-center gap-2 text-sra-primary font-semibold text-sm hover:text-blue-700 bg-transparent border-0 cursor-pointer transition-colors">
+              <i className="bi bi-box-arrow-in-right"></i> Sign in instead
+            </button>
           </div>
         </div>
+
+        {/* Bottom tagline */}
+        <p className="text-center text-xs text-blue-200/50 mt-6 relative z-10">
+          Smart Resource Allocation • H2S × Google for Developers
+        </p>
       </div>
     </div>
   );

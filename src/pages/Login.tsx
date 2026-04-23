@@ -45,56 +45,104 @@ export default function Login() {
   };
 
   return (
-    <div className="min-h-screen bg-sra-light flex items-center justify-center p-4">
-      <div className="w-full max-w-[420px]">
-        <div className="sra-card shadow-lg p-8">
+    <div className="auth-page flex items-center justify-center p-4">
+      {/* Animated background bubbles */}
+      <div className="auth-bubble"></div>
+      <div className="auth-bubble"></div>
+      <div className="auth-bubble"></div>
+      <div className="auth-bubble"></div>
+      <div className="auth-bubble"></div>
+
+      <div className="w-full max-w-[440px]">
+        <div className="auth-card p-8 sm:p-10">
           {/* Header */}
-          <div className="text-center mb-6">
-            <div className="w-14 h-14 rounded-2xl bg-blue-50 text-sra-primary flex items-center justify-center mx-auto mb-4">
-              <i className="bi bi-geo-alt-fill text-2xl"></i>
+          <div className="text-center mb-8">
+            <div className="relative inline-block">
+              <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-[#2563EB] to-[#6366F1] flex items-center justify-center mx-auto mb-5 shadow-lg" style={{ animation: "pulseGlow 3s ease-in-out infinite" }}>
+                <i className="bi bi-geo-alt-fill text-white text-2xl"></i>
+              </div>
             </div>
-            <h1 className="text-2xl font-bold text-sra-dark">Welcome Back</h1>
-            <p className="text-sra-muted text-sm mt-1">Sign in to continue</p>
+            <h1 className="text-2xl font-bold text-sra-dark tracking-tight">Welcome back</h1>
+            <p className="text-sra-muted text-sm mt-2">Sign in to your Smart Resource Allocation account</p>
           </div>
 
           {/* Error */}
           {error && (
-            <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-xl text-sm mb-4 flex items-center gap-2 fade-in-up">
-              <i className="bi bi-exclamation-circle"></i>{error}
+            <div className="sra-error-box mb-5">
+              <i className="bi bi-exclamation-circle text-base"></i>
+              <span>{error}</span>
             </div>
           )}
 
           {/* Form */}
           <form onSubmit={handleSubmit}>
-            <div className="form-floating mb-3">
-              <input type="email" className="form-control form-control-lg rounded-xl border-sra-border" id="email" placeholder="Email address" value={email} onChange={e => setEmail(e.target.value)} autoComplete="email" />
-              <label htmlFor="email">Email address</label>
+            <div className="sra-input-group">
+              <label htmlFor="email">Email Address</label>
+              <div className="sra-input-wrapper">
+                <i className="bi bi-envelope sra-input-icon"></i>
+                <input
+                  type="email"
+                  className="sra-input"
+                  id="email"
+                  placeholder="you@example.com"
+                  value={email}
+                  onChange={e => setEmail(e.target.value)}
+                  autoComplete="email"
+                />
+              </div>
             </div>
-            <div className="form-floating mb-3 position-relative">
-              <input type={showPassword ? "text" : "password"} className="form-control form-control-lg rounded-xl border-sra-border pe-12" id="password" placeholder="Password" value={password} onChange={e => setPassword(e.target.value)} autoComplete="current-password" />
+
+            <div className="sra-input-group">
               <label htmlFor="password">Password</label>
-              <button type="button" onClick={() => setShowPassword(!showPassword)} className="btn btn-link position-absolute top-50 end-0 translate-middle-y text-sra-muted me-3 p-0" aria-label="Toggle password visibility">
-                <i className={`bi ${showPassword ? "bi-eye-slash" : "bi-eye"}`}></i>
-              </button>
+              <div className="sra-input-wrapper">
+                <i className="bi bi-lock sra-input-icon"></i>
+                <input
+                  type={showPassword ? "text" : "password"}
+                  className="sra-input"
+                  id="password"
+                  placeholder="Enter your password"
+                  value={password}
+                  onChange={e => setPassword(e.target.value)}
+                  autoComplete="current-password"
+                />
+                <button type="button" onClick={() => setShowPassword(!showPassword)} className="sra-password-toggle" aria-label="Toggle password visibility">
+                  <i className={`bi ${showPassword ? "bi-eye-slash" : "bi-eye"}`}></i>
+                </button>
+              </div>
             </div>
 
-            <div className="text-end mb-4">
-              <a href="#" className="text-sra-primary text-sm no-underline hover:underline">Forgot password?</a>
+            <div className="flex items-center justify-between mb-6">
+              <label className="flex items-center gap-2 text-sm text-sra-muted cursor-pointer">
+                <input type="checkbox" className="w-4 h-4 rounded border-sra-border text-sra-primary accent-[#2563EB]" />
+                Remember me
+              </label>
+              <a href="#" className="text-sm font-medium text-sra-primary hover:text-blue-700 no-underline transition-colors">Forgot password?</a>
             </div>
 
-            <button type="submit" disabled={loading} className="w-full btn bg-sra-primary text-white py-3 rounded-xl font-semibold text-lg hover:opacity-90 transition-opacity flex items-center justify-center gap-2 border-0">
-              {loading ? (<><span className="spinner-border spinner-border-sm" role="status"></span>Signing in...</>) : (<><i className="bi bi-box-arrow-in-right"></i>Sign In</>)}
+            <button type="submit" disabled={loading} className="sra-btn-primary">
+              {loading ? (
+                <><span className="spinner-border spinner-border-sm" role="status"></span>Signing in...</>
+              ) : (
+                <>Sign In <i className="bi bi-arrow-right"></i></>
+              )}
             </button>
           </form>
 
-          <div className="text-center mt-5">
-            <div className="relative mb-4">
-              <div className="absolute inset-0 flex items-center"><div className="w-full border-t border-sra-border"></div></div>
-              <span className="relative bg-white px-4 text-sm text-sra-muted">Don't have an account?</span>
-            </div>
-            <a href="/register" className="text-sra-primary font-semibold no-underline hover:underline" onClick={e => { e.preventDefault(); navigate("/register"); }}>Create an account <i className="bi bi-arrow-right"></i></a>
+          <div className="sra-divider">
+            <span>New here?</span>
+          </div>
+
+          <div className="text-center">
+            <button onClick={() => navigate("/register")} className="inline-flex items-center gap-2 text-sra-primary font-semibold text-sm hover:text-blue-700 bg-transparent border-0 cursor-pointer transition-colors">
+              Create an account <i className="bi bi-arrow-right"></i>
+            </button>
           </div>
         </div>
+
+        {/* Bottom tagline */}
+        <p className="text-center text-xs text-blue-200/50 mt-6 relative z-10">
+          Smart Resource Allocation • H2S × Google for Developers
+        </p>
       </div>
     </div>
   );
