@@ -1393,3 +1393,115 @@ html.dark .hover\:bg-red-50:hover {
 html {
   scroll-behavior: smooth;
 }
+
+/* ── Dark Mode: Profile/Notification Dropdown Fix ── */
+/* bg-white/95 (opacity variant) is NOT caught by .bg-white rule — override explicitly */
+html.dark .bg-white\/95 {
+  background-color: #1e293b !important;
+  border-color: #334155 !important;
+}
+
+html.dark .bg-white\/95 .text-sra-dark,
+html.dark .bg-white\/95 .font-semibold {
+  color: #f1f5f9 !important;
+}
+
+html.dark .bg-white\/95 .text-sra-muted {
+  color: #94a3b8 !important;
+}
+
+html.dark .bg-white\/95 .border-sra-border {
+  border-color: #334155 !important;
+}
+
+/* Role badge colors in dropdown — preserve them in dark mode */
+html.dark .bg-white\/95 .bg-purple-100 {
+  background-color: rgba(139, 92, 246, 0.2) !important;
+}
+
+html.dark .bg-white\/95 .text-purple-700 {
+  color: #c4b5fd !important;
+}
+
+html.dark .bg-white\/95 .bg-green-100 {
+  background-color: rgba(16, 185, 129, 0.2) !important;
+}
+
+html.dark .bg-white\/95 .text-green-700 {
+  color: #6ee7b7 !important;
+}
+
+html.dark .bg-white\/95 .bg-blue-100 {
+  background-color: rgba(59, 130, 246, 0.2) !important;
+}
+
+html.dark .bg-white\/95 .text-blue-700 {
+  color: #93c5fd !important;
+}
+
+html.dark .bg-white\/95 .hover\:bg-slate-50:hover {
+  background-color: rgba(51, 65, 85, 0.5) !important;
+}
+
+html.dark .bg-white\/95 .text-red-600 {
+  color: #f87171 !important;
+}
+
+html.dark .bg-white\/95 .hover\:bg-red-50:hover {
+  background-color: rgba(127, 29, 29, 0.2) !important;
+}
+
+/* ── Dark Mode: Auth Card + Inputs Fix ── */
+html.dark .auth-card {
+  background: rgba(15, 23, 42, 0.97) !important;
+  border-color: #334155 !important;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2), 0 20px 60px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.04) !important;
+}
+
+/* Inputs inside auth-card: use a lighter dark so they stand out from the card */
+html.dark .auth-card .sra-input {
+  background: #1e293b !important;
+  border-color: #334155 !important;
+  color: #f1f5f9 !important;
+}
+
+html.dark .auth-card .sra-input:hover {
+  background: #263347 !important;
+  border-color: #475569 !important;
+}
+
+html.dark .auth-card .sra-input:focus {
+  background: #263347 !important;
+  border-color: #2563eb !important;
+}
+
+/* Tab bar background inside dark auth card */
+html.dark .auth-card .sra-tabs {
+  background: #0f172a !important;
+}
+
+html.dark .auth-card .sra-tab.active {
+  background: #1e293b !important;
+}
+
+/* Labels inside auth-card in dark mode */
+html.dark .auth-card .sra-input-group label {
+  color: #94a3b8 !important;
+}
+
+html.dark .auth-card .text-sra-dark {
+  color: #f1f5f9 !important;
+}
+
+html.dark .auth-card .text-sra-muted {
+  color: #94a3b8 !important;
+}
+
+html.dark .auth-card .border-sra-border {
+  border-color: #334155 !important;
+}
+
+html.dark .auth-card .sra-divider span {
+  background: #0f172a !important;
+  color: #64748b !important;
+}
