@@ -21,22 +21,11 @@ function createVolIcon(available: boolean) {
   });
 }
 
-function isDark() {
-  return document.documentElement.classList.contains("dark");
-}
-
 export default function LiveMap() {
   const [needs, setNeeds] = useState<Need[]>([]);
   const [volunteers, setVolunteers] = useState<Volunteer[]>([]);
   const [filterOpen, setFilterOpen] = useState(false);
   const [matchModal, setMatchModal] = useState<{ open: boolean; matches: any[]; needDesc: string; needId: number }>({ open: false, matches: [], needDesc: "", needId: 0 });
-  const [dark, setDark] = useState(isDark());
-
-  useEffect(() => {
-    const observer = new MutationObserver(() => setDark(isDark()));
-    observer.observe(document.documentElement, { attributes: true, attributeFilter: ["class"] });
-    return () => observer.disconnect();
-  }, []);
 
   useEffect(() => {
     loadData();
@@ -58,9 +47,7 @@ export default function LiveMap() {
   const openNeeds = needs.filter(n => n.status === "open").length;
   const activeVols = volunteers.filter(v => v.is_available).length;
 
-  const tileUrl = dark
-    ? "https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
-    : "https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png";
+  const tileUrl = "https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png";
 
   const tileAttribution = '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>';
 
