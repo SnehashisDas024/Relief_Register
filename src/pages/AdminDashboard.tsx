@@ -271,14 +271,14 @@ export default function AdminDashboard() {
             </div>
 
             {uploadFile && (
-              <button onClick={handleFileUpload} disabled={uploading} className="btn bg-sra-primary text-white w-full mt-3 py-2.5 rounded-xl font-medium border-0 flex items-center justify-center gap-2">
+              <button onClick={handleFileUpload} disabled={uploading} className="btn text-white w-full mt-3 py-2.5 rounded-xl font-medium border-0 flex items-center justify-center gap-2" style={{ background: "linear-gradient(135deg, #2563EB, #6366F1)" }}>
                 {uploading ? <><span className="spinner-border spinner-border-sm"></span>Processing...</> : <><i className="bi bi-gear-wide-connected"></i>Process Data</>}
               </button>
             )}
 
             {/* Pipeline Tracker */}
             {pipeline && (
-              <div className="mt-4 p-3 bg-slate-50 rounded-xl">
+              <div className="mt-4 p-4 rounded-xl" style={{ background: "var(--sra-bg-input)" }}>
                 <div className="text-xs text-sra-muted mb-2">Source: <span className="font-mono">{pipeline.source_id.slice(0, 16)}...</span></div>
                 <div className="pipeline-steps">
                   {pipelineStages.map((stage, i) => {
@@ -326,8 +326,8 @@ export default function AdminDashboard() {
 
       {/* Match Modal */}
       {showMatch && (
-        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4" onClick={() => setShowMatch(false)}>
-          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-2xl max-h-[80vh] overflow-y-auto fade-in-up" onClick={e => e.stopPropagation()}>
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4" onClick={() => setShowMatch(false)}>
+          <div className="rounded-2xl shadow-2xl w-full max-w-2xl max-h-[80vh] overflow-y-auto fade-in-up" style={{ background: "var(--sra-bg-card-solid)" }} onClick={e => e.stopPropagation()}>
             <div className="p-5 border-b border-sra-border flex items-center justify-between">
               <h3 className="font-semibold text-sra-dark">Top Volunteer Matches for "{matchData.needDesc}"</h3>
               <button onClick={() => setShowMatch(false)} className="btn-close"></button>
@@ -335,7 +335,7 @@ export default function AdminDashboard() {
             <div className="p-5">
               {matchData.matches.length > 0 ? matchData.matches.map((m, i) => (
                 <div key={m.volunteer_id} className={`flex items-center gap-4 p-4 rounded-xl mb-3 border ${i === 0 ? "border-sra-primary bg-blue-50/30" : "border-sra-border"}`}>
-                  <div className={`w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm ${i === 0 ? "bg-sra-primary text-white" : "bg-slate-100 text-sra-muted"}`}>#{i + 1}</div>
+                  <div className={`w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm flex-shrink-0 ${i === 0 ? "text-white" : ""}`} style={{ background: i === 0 ? "#2563EB" : "var(--sra-bg-input)", color: i === 0 ? "white" : "var(--sra-text-secondary)" }}>#{i + 1}</div>
                   <div className="flex-1 min-w-0">
                     <div className="font-medium text-sra-dark">{m.name}</div>
                     <div className="flex flex-wrap gap-1 mt-1">

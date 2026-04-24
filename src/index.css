@@ -34,7 +34,6 @@ html {
   --sra-border-hover: #cbd5e1;
   --sra-shadow: rgba(0, 0, 0, 0.06);
   --sra-shadow-hover: rgba(0, 0, 0, 0.1);
-  --sra-map-tile-filter: none;
   --sra-popup-bg: #ffffff;
   --sra-popup-text: #1e293b;
 }
@@ -53,9 +52,16 @@ html.dark {
   --sra-border-hover: #475569;
   --sra-shadow: rgba(0, 0, 0, 0.3);
   --sra-shadow-hover: rgba(0, 0, 0, 0.5);
-  --sra-map-tile-filter: brightness(0.85) contrast(1.1) saturate(0.8);
   --sra-popup-bg: #1e293b;
   --sra-popup-text: #f1f5f9;
+
+  /* ── Override Tailwind theme tokens so ALL utilities auto-adapt ── */
+  --color-sra-dark: #f1f5f9;
+  --color-sra-text: #e2e8f0;
+  --color-sra-muted: #94a3b8;
+  --color-sra-light: #0b1120;
+  --color-sra-border: #334155;
+  --color-sra-card: rgba(30, 41, 59, 0.75);
 }
 
 /* ── Global Styles ── */
@@ -1173,19 +1179,156 @@ html.dark nav {
   background: #0f172a !important;
 }
 
-/* ── Dark Mode Select / Form Controls ── */
+/* ── Dark mode badge / status text fixes ── */
+html.dark .text-green-700,
+html.dark .text-green-800 {
+  color: #34d399 !important;
+}
+
+html.dark .text-red-700,
+html.dark .text-red-800 {
+  color: #f87171 !important;
+}
+
+html.dark .text-yellow-700,
+html.dark .text-yellow-800 {
+  color: #fbbf24 !important;
+}
+
+html.dark .text-purple-700 {
+  color: #c084fc !important;
+}
+
+html.dark .text-blue-700 {
+  color: #60a5fa !important;
+}
+
+html.dark .text-slate-700 {
+  color: #cbd5e1 !important;
+}
+
+html.dark .text-gray-700 {
+  color: #d1d5db !important;
+}
+
+html.dark .fw-medium {
+  color: var(--sra-text-primary);
+}
+
+/* ── Global Form Controls (consistent everywhere) ── */
+.form-control,
+.form-select {
+  background-color: var(--sra-bg-input) !important;
+  border: 2px solid var(--sra-border) !important;
+  border-radius: 0.875rem !important;
+  padding: 0.75rem 1rem !important;
+  font-size: 0.875rem !important;
+  color: var(--sra-text-primary) !important;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  box-shadow: none !important;
+  font-family: inherit !important;
+}
+
+.form-control::placeholder {
+  color: var(--sra-text-muted) !important;
+}
+
+.form-control:hover,
+.form-select:hover {
+  border-color: var(--sra-border-hover) !important;
+  background-color: var(--sra-bg-input-hover) !important;
+}
+
+.form-control:focus,
+.form-select:focus {
+  border-color: #2563eb !important;
+  background-color: var(--sra-bg-input-hover) !important;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1) !important;
+  outline: none !important;
+}
+
+.form-control-lg {
+  padding: 0.875rem 1.125rem !important;
+  font-size: 1rem !important;
+}
+
+.form-select-sm {
+  padding: 0.5rem 0.75rem !important;
+  font-size: 0.8rem !important;
+  border-radius: 0.75rem !important;
+}
+
+textarea.form-control {
+  min-height: 80px;
+  resize: vertical;
+}
+
+/* ── Chat Textarea ── */
+.sra-chat-input {
+  width: 100%;
+  padding: 0.75rem 1.125rem;
+  font-size: 0.9rem;
+  color: var(--sra-text-primary);
+  background: var(--sra-bg-input);
+  border: 2px solid var(--sra-border);
+  border-radius: 1.5rem;
+  resize: none;
+  outline: none;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  font-family: inherit;
+}
+
+.sra-chat-input::placeholder {
+  color: var(--sra-text-muted);
+}
+
+.sra-chat-input:hover {
+  border-color: var(--sra-border-hover);
+  background: var(--sra-bg-input-hover);
+}
+
+.sra-chat-input:focus {
+  border-color: #2563eb;
+  background: var(--sra-bg-input-hover);
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+
+/* ── Inline search input with icon ── */
+.sra-search-input {
+  position: relative;
+  display: flex;
+  align-items: center;
+  flex: 1;
+}
+
+.sra-search-input .sra-search-icon {
+  position: absolute;
+  left: 1rem;
+  color: var(--sra-text-muted);
+  font-size: 0.95rem;
+  pointer-events: none;
+  transition: color 0.25s;
+  z-index: 2;
+}
+
+.sra-search-input input,
+.sra-search-input .form-control {
+  padding-left: 2.75rem !important;
+}
+
+.sra-search-input:focus-within .sra-search-icon {
+  color: #2563eb;
+}
+
+/* ── Dark mode overrides for form controls ── */
 html.dark .form-control,
 html.dark .form-select {
-  background-color: var(--sra-bg-input);
-  border-color: var(--sra-border);
-  color: var(--sra-text-primary);
+  color: #f1f5f9 !important;
 }
 
 html.dark .form-control:focus,
 html.dark .form-select:focus {
-  background-color: var(--sra-bg-input-hover);
-  border-color: #2563eb;
-  color: var(--sra-text-primary);
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.2) !important;
 }
 
 html.dark .form-check-input {

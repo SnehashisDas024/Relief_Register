@@ -270,7 +270,7 @@ export default function VolunteerDashboard() {
       {/* Rating Modal */}
       {showRating && (
         <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md p-6 fade-in-up">
+          <div className="rounded-2xl shadow-2xl w-full max-w-md p-6 fade-in-up" style={{ background: "var(--sra-bg-card-solid)" }}>
             <h3 className="text-lg font-bold text-sra-dark mb-4 text-center">How did this task go?</h3>
             <div className="star-rating flex justify-center gap-2 mb-4">
               {[1, 2, 3, 4, 5].map(star => (
@@ -278,7 +278,7 @@ export default function VolunteerDashboard() {
                   onClick={() => setRatingValue(star)} onMouseEnter={e => (e.currentTarget.className = "bi bi-star-fill cursor-pointer")} onMouseLeave={e => (e.currentTarget.className = `bi ${star <= ratingValue ? "bi-star-fill" : "bi-star"} cursor-pointer`)}></i>
               ))}
             </div>
-            <textarea className="form-control rounded-xl border-sra-border mb-4" rows={3} placeholder="Optional comment..." value={ratingComment} onChange={e => setRatingComment(e.target.value)}></textarea>
+            <textarea className="form-control mb-4" rows={3} placeholder="Share your experience (optional)..." value={ratingComment} onChange={e => setRatingComment(e.target.value)}></textarea>
             <button onClick={submitRating} disabled={ratingValue === 0} className="btn bg-sra-primary text-white w-full py-2.5 rounded-xl font-semibold border-0">Submit Rating</button>
           </div>
         </div>

@@ -80,12 +80,12 @@ export default function LiveMap() {
                     <span style={{ fontSize: "11px", padding: "3px 10px", borderRadius: "999px", fontWeight: 600, background: color + "20", color }}>{need.category}</span>
                     <span style={{ fontSize: "11px", padding: "3px 10px", borderRadius: "999px", background: need.status === "open" ? "#EF4444" : need.status === "assigned" ? "#F59E0B" : "#10B981", color: "white" }}>{need.status}</span>
                   </div>
-                  <p style={{ fontSize: "13px", margin: "0 0 8px 0", lineHeight: "1.5", color: "#334155" }}>{truncate(need.description, 100)}</p>
-                  <div style={{ fontSize: "12px", color: "#64748b", marginBottom: "4px" }}>⏱ Urgency: <strong>{need.urgency_score.toFixed(2)}</strong> ({getUrgencyLabel(need.urgency_score)})</div>
-                  <div style={{ fontSize: "12px", color: "#64748b", marginBottom: "12px" }}>📍 {need.location} • {need.zone}</div>
+                  <p style={{ fontSize: "13px", margin: "0 0 8px 0", lineHeight: "1.5", color: "var(--sra-popup-text)" }}>{truncate(need.description, 100)}</p>
+                  <div style={{ fontSize: "12px", color: "var(--sra-text-secondary)", marginBottom: "4px" }}>⏱ Urgency: <strong style={{ color: "var(--sra-popup-text)" }}>{need.urgency_score.toFixed(2)}</strong> ({getUrgencyLabel(need.urgency_score)})</div>
+                  <div style={{ fontSize: "12px", color: "var(--sra-text-secondary)", marginBottom: "12px" }}>📍 {need.location} • {need.zone}</div>
                   <div style={{ display: "flex", gap: "8px" }}>
                     <button onClick={() => openMatchModal(need.id, need.description)} style={{ fontSize: "12px", padding: "6px 14px", borderRadius: "10px", border: "none", background: "#2563EB", color: "white", cursor: "pointer", fontWeight: 500 }}>🔗 Match</button>
-                    <a href={`/chat/task_${need.id}`} style={{ fontSize: "12px", padding: "6px 14px", borderRadius: "10px", border: "1px solid #e2e8f0", background: "white", color: "#334155", textDecoration: "none", fontWeight: 500 }}>💬 Chat</a>
+                    <a href={`/chat/task_${need.id}`} style={{ fontSize: "12px", padding: "6px 14px", borderRadius: "10px", border: "1px solid var(--sra-border)", background: "var(--sra-bg-input)", color: "var(--sra-popup-text)", textDecoration: "none", fontWeight: 500 }}>💬 Chat</a>
                   </div>
                 </div>
               </Popup>
@@ -97,19 +97,19 @@ export default function LiveMap() {
           <Marker key={`vol-${vol.id}`} position={[vol.lat, vol.lng]} icon={createVolIcon(vol.is_available)}>
             <Popup>
               <div style={{ minWidth: "220px" }}>
-                <div style={{ fontWeight: 600, fontSize: "14px", marginBottom: "6px", color: "#1e293b" }}>{vol.name}</div>
+                <div style={{ fontWeight: 600, fontSize: "14px", marginBottom: "6px", color: "var(--sra-popup-text)" }}>{vol.name}</div>
                 <div style={{ display: "flex", alignItems: "center", gap: "2px", marginBottom: "8px" }}>
                   {Array.from({ length: 5 }).map((_, i) => (
-                    <span key={i} style={{ color: i < Math.floor(vol.rating) ? "#F59E0B" : "#d1d5db", fontSize: "13px" }}>★</span>
+                    <span key={i} style={{ color: i < Math.floor(vol.rating) ? "#F59E0B" : "#64748b", fontSize: "13px" }}>★</span>
                   ))}
-                  <span style={{ fontSize: "12px", color: "#64748b", marginLeft: "4px" }}>{vol.rating}</span>
+                  <span style={{ fontSize: "12px", color: "var(--sra-text-secondary)", marginLeft: "4px" }}>{vol.rating}</span>
                 </div>
                 <div style={{ display: "flex", flexWrap: "wrap", gap: "4px", marginBottom: "10px" }}>
                   {vol.skills.map(s => (
-                    <span key={s} style={{ fontSize: "10px", background: "#eff6ff", color: "#2563eb", padding: "2px 8px", borderRadius: "6px" }}>{s}</span>
+                    <span key={s} style={{ fontSize: "10px", background: "rgba(37,99,235,0.1)", color: "#60a5fa", padding: "2px 8px", borderRadius: "6px" }}>{s}</span>
                   ))}
                 </div>
-                <span style={{ fontSize: "11px", padding: "3px 10px", borderRadius: "999px", background: vol.is_available ? "#dcfce7" : "#f1f5f9", color: vol.is_available ? "#166534" : "#475569" }}>{vol.is_available ? "Available" : "On Task"}</span>
+                <span style={{ fontSize: "11px", padding: "3px 10px", borderRadius: "999px", background: vol.is_available ? "rgba(16,185,129,0.15)" : "rgba(100,116,139,0.15)", color: vol.is_available ? "#34d399" : "#94a3b8" }}>{vol.is_available ? "Available" : "On Task"}</span>
               </div>
             </Popup>
           </Marker>
@@ -136,7 +136,7 @@ export default function LiveMap() {
             </div>
             <div>
               <label className="text-xs font-semibold uppercase tracking-wider mb-2 block" style={{ color: "var(--sra-text-secondary)" }}>Zone</label>
-              <select className="form-select form-select-sm rounded-xl" style={{ borderColor: "var(--sra-border)" }}>
+              <select className="form-select form-select-sm">
                 <option value="">All Zones</option>
                 <option>North Delhi</option><option>South Delhi</option><option>East Delhi</option><option>West Delhi</option><option>Central Delhi</option>
               </select>
@@ -194,7 +194,7 @@ export default function LiveMap() {
             <div className="p-5">
               {matchModal.matches.length > 0 ? matchModal.matches.map((m: any, i: number) => (
                 <div key={m.volunteer_id} className={`flex items-center gap-4 p-4 rounded-xl mb-3 border transition-all duration-200 hover:shadow-md ${i === 0 ? "border-sra-primary bg-blue-50/30" : "border-sra-border hover:border-blue-200"}`}>
-                  <div className={`w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm ${i === 0 ? "bg-sra-primary text-white" : "bg-slate-100 text-sra-muted"}`}>#{i + 1}</div>
+                  <div className={`w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm flex-shrink-0 ${i === 0 ? "text-white" : ""}`} style={{ background: i === 0 ? "#2563EB" : "var(--sra-bg-input)", color: i === 0 ? "white" : "var(--sra-text-secondary)" }}>#{i + 1}</div>
                   <div className="flex-1">
                     <div className="font-medium text-sm" style={{ color: "var(--sra-text-primary)" }}>{m.name}</div>
                     <div className="text-xs mt-1" style={{ color: "var(--sra-text-secondary)" }}>{m.distance_km} km • Skill: {m.skill_score} • Geo: {m.geo_score}</div>

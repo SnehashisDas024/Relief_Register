@@ -90,7 +90,7 @@ export default function Chat() {
   return (
     <div className="flex flex-col" style={{ height: "calc(100vh - 56px)" }}>
       {/* Header */}
-      <div className="flex items-center gap-3 px-4 py-3 bg-white border-b border-sra-border flex-shrink-0">
+      <div className="flex items-center gap-3 px-4 py-3 border-b flex-shrink-0" style={{ background: "var(--sra-bg-card-solid)", borderColor: "var(--sra-border)" }}>
         <button onClick={() => navigate(-1)} className="btn btn-sm btn-link text-sra-muted p-0" aria-label="Go back">
           <i className="bi bi-arrow-left text-lg"></i>
         </button>
@@ -108,7 +108,7 @@ export default function Chat() {
       </div>
 
       {/* Messages */}
-      <div ref={containerRef} onScroll={handleScroll} className="flex-1 overflow-y-auto px-4 py-4" style={{ background: "#F1F5F9" }}>
+      <div ref={containerRef} onScroll={handleScroll} className="flex-1 overflow-y-auto px-4 py-4" style={{ background: "var(--sra-bg)" }}>
         {messages.length === 0 ? (
           <div className="flex flex-col items-center justify-center h-full text-sra-muted">
             <i className="bi bi-chat-dots text-5xl opacity-30 mb-3"></i>
@@ -139,7 +139,7 @@ export default function Chat() {
 
         {/* Scroll FAB */}
         {showScrollFab && (
-          <button onClick={scrollToBottom} className="fixed bottom-24 right-6 w-10 h-10 rounded-full bg-white shadow-lg flex items-center justify-center text-sra-primary z-10 border border-sra-border" id="scroll-fab" aria-label="Scroll to bottom">
+          <button onClick={scrollToBottom} className="fixed bottom-24 right-6 w-10 h-10 rounded-full shadow-lg flex items-center justify-center text-sra-primary z-10" id="scroll-fab" aria-label="Scroll to bottom" style={{ background: "var(--sra-bg-card-solid)", border: "1px solid var(--sra-border)" }}>
             <i className="bi bi-chevron-double-down"></i>
           </button>
         )}
@@ -147,18 +147,18 @@ export default function Chat() {
 
       {/* Typing Indicator */}
       {isTyping && (
-        <div className="px-4 py-1 text-xs text-sra-muted italic" style={{ background: "#F1F5F9" }}>
+        <div className="px-4 py-1 text-xs text-sra-muted italic" style={{ background: "var(--sra-bg)" }}>
           Someone is typing...
         </div>
       )}
 
       {/* Input Bar */}
-      <div className="px-4 py-3 bg-white border-t border-sra-border flex-shrink-0">
-        <div className="max-w-2xl mx-auto flex items-end gap-2">
-          <div className="flex-1">
+      <div className="px-4 py-3 border-t flex-shrink-0" style={{ background: "var(--sra-bg-card-solid)", borderColor: "var(--sra-border)" }}>
+        <div className="max-w-2xl mx-auto flex items-end gap-2.5">
+          <div className="flex-1 relative">
             <textarea
               id="message-input"
-              className="w-full border border-sra-border rounded-2xl px-4 py-2.5 text-sm resize-none focus:outline-none focus:border-sra-primary"
+              className="sra-chat-input"
               placeholder="Type a message..."
               rows={1}
               maxLength={1000}
@@ -168,10 +168,13 @@ export default function Chat() {
               style={{ maxHeight: "120px" }}
             />
             {newMessage.length > 200 && (
-              <div className="text-right text-[10px] text-sra-muted mt-0.5">{newMessage.length}/1000</div>
+              <div className="text-right text-[10px] mt-1" style={{ color: "var(--sra-text-muted)" }}>{newMessage.length}/1000</div>
             )}
           </div>
-          <button onClick={sendMessage} disabled={!newMessage.trim()} className="btn rounded-full w-10 h-10 flex items-center justify-center flex-shrink-0 border-0 text-white" style={{ background: "#2563EB" }} aria-label="Send message">
+          <button onClick={sendMessage} disabled={!newMessage.trim()}
+            className="btn rounded-full w-11 h-11 flex items-center justify-center flex-shrink-0 border-0 text-white shadow-md transition-all duration-200 hover:scale-105 hover:shadow-lg"
+            style={{ background: "linear-gradient(135deg, #2563EB, #6366F1)" }}
+            aria-label="Send message">
             <i className="bi bi-send-fill"></i>
           </button>
         </div>
@@ -179,8 +182,8 @@ export default function Chat() {
 
       {/* Info Offcanvas */}
       {showInfo && (
-        <div className="fixed inset-0 bg-black/30 z-50 flex justify-end" onClick={() => setShowInfo(false)}>
-          <div className="bg-white w-80 h-full shadow-2xl p-5 overflow-y-auto fade-in-up" onClick={e => e.stopPropagation()}>
+        <div className="fixed inset-0 bg-black/30 backdrop-blur-sm z-50 flex justify-end" onClick={() => setShowInfo(false)}>
+          <div className="w-80 h-full shadow-2xl p-5 overflow-y-auto fade-in-up border-l" style={{ background: "var(--sra-bg-card-solid)", borderColor: "var(--sra-border)" }} onClick={e => e.stopPropagation()}>
             <div className="flex items-center justify-between mb-4">
               <h3 className="font-semibold text-sra-dark">Room Info</h3>
               <button onClick={() => setShowInfo(false)} className="btn-close"></button>
