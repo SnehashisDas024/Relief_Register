@@ -80,10 +80,12 @@ const MOCK_PIPELINE: Record<string, { stage: string; timestamp: string; meta: Re
 
 // ─── Core fetch helper ────────────────────────────────────────────────────────
 
+const API_BASE = import.meta.env.VITE_API_URL ?? "";
+
 async function apiFetch<T>(url: string, fallback: T, options?: RequestInit): Promise<T> {
   try {
     const isFormData = options?.body instanceof FormData;
-    const res = await fetch(url, {
+    const res = await fetch(`${API_BASE}${url}`, {
       ...options,
       headers: { ...getAuthHeaders(!isFormData), ...(options?.headers || {}) },
     });
@@ -162,7 +164,7 @@ export async function apiPost(url: string, data?: any): Promise<any> {
 
 export async function apiUpload(url: string, formData: FormData): Promise<any> {
   try {
-    const res = await fetch(url, {
+    const res = await fetch(`${API_BASE}${url}`, {
       method: "POST",
       // Do NOT set Content-Type — browser must set it with the boundary
       headers: { Authorization: `Bearer ${SRA.token || ""}` },
