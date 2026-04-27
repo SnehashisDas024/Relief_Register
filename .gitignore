@@ -1,0 +1,49 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+.venv/
+venv/
+env/
+*.egg-info/
+dist/
+build/
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Flask / SQLite dev DB
+backend/*.db
+backend/instance/
+backend/logs/*.log
+
+# Migrations (keep the folder, not the compiled pyc)
+backend/migrations/versions/__pycache__/
+
+# Celery
+celerybeat-schedule
+celerybeat.pid
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# Node / React
+frontend/node_modules/
+frontend/dist/
+# NOTE: frontend/templates/app.html IS committed — it's the built bundle
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+
+*.bak
+*.dat
+*.dir
+backend/celerybeat-schedule*
