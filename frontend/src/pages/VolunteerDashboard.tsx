@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import { apiGet, apiPost, apiPatch, getUrgencyClass, getUrgencyLabel, getGreeting, SRA, formatDate } from "../utils/api";
+import { apiGet, apiPost, apiUpload, apiPatch, getUrgencyClass, getUrgencyLabel, getGreeting, SRA, formatDate } from "../utils/api";
 
 interface Task {
   id: number;
@@ -100,7 +100,7 @@ export default function VolunteerDashboard() {
     setUploading(true);
     const formData = new FormData();
     formData.append("file", uploadFile);
-    await apiPost("/api/upload", formData);
+    await apiUpload("/api/upload", formData);
     setUploading(false);
     setUploadFile(null);
   };

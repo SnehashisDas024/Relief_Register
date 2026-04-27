@@ -1,0 +1,243 @@
+{% extends "base.html" %}
+{% block title %}Dashboard — SRA{% endblock %}
+{% block extra_css %}<link href="{{ url_for('static', filename='css/dashboard.css') }}" rel="stylesheet"/>{% endblock %}
+
+{% block content %}
+<div class="dash-layout">
+  <!-- Sidebar -->
+  <aside class="dash-sidebar" id="dash-sidebar">
+    <div class="sidebar-header">
+      <i class="bi bi-geo-alt-fill text-primary fs-4"></i>
+      <span class="fw-bold">SRA Admin</span>
+    </div>
+    <nav class="sidebar-nav">
+      <a href="/dashboard" class="sidebar-link active"><i class="bi bi-speedometer2"></i> Dashboard</a>
+      <a href="/map"       class="sidebar-link"><i class="bi bi-map"></i> Live Map</a>
+      <a href="/admin"     class="sidebar-link"><i class="bi bi-people"></i> Users</a>
+      <a href="/chat/admin_general" class="sidebar-link"><i class="bi bi-chat-dots"></i> Chat</a>
+    </nav>
+    <div class="sidebar-footer">
+      <button class="btn btn-outline-danger btn-sm w-100" onclick="SRA.logout()">
+        <i class="bi bi-box-arrow-right me-2"></i>Sign Out
+      </button>
+    </div>
+  </aside>
+
+  <!-- Main -->
+  <div class="dash-main">
+    <!-- Top bar -->
+    <div class="dash-topbar">
+      <div>
+        <h1 class="dash-title">Dashboard</h1>
+        <p class="dash-sub text-muted mb-0" id="dash-greeting">Good morning, Admin</p>
+      </div>
+      <div class="d-flex gap-2 align-items-center">
+        <button class="btn btn-outline-secondary btn-sm" onclick="loadDashboard()">
+          <i class="bi bi-arrow-clockwise me-1"></i>Refresh
+        </button>
+        <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#uploadModal">
+          <i class="bi bi-upload me-1"></i>Upload Data
+        </button>
+      </div>
+    </div>
+
+    <!-- KPI Cards -->
+    <div class="row g-3 mb-4" id="kpi-row">
+      <div class="col-6 col-xl-3">
+        <div class="kpi-card kpi-blue">
+          <div class="kpi-icon"><i class="bi bi-exclamation-circle"></i></div>
+          <div class="kpi-num" id="kpi-open">—</div>
+          <div class="kpi-label">Open Needs</div>
+        </div>
+      </div>
+      <div class="col-6 col-xl-3">
+        <div class="kpi-card kpi-green">
+          <div class="kpi-icon"><i class="bi bi-check-circle"></i></div>
+          <div class="kpi-num" id="kpi-today">—</div>
+          <div class="kpi-label">Completed Today</div>
+        </div>
+      </div>
+      <div class="col-6 col-xl-3">
+        <div class="kpi-card kpi-purple">
+          <div class="kpi-icon"><i class="bi bi-people"></i></div>
+          <div class="kpi-num" id="kpi-vols">—</div>
+          <div class="kpi-label">Active Volunteers</div>
+        </div>
+      </div>
+      <div class="col-6 col-xl-3">
+        <div class="kpi-card kpi-amber">
+          <div class="kpi-icon"><i class="bi bi-bullseye"></i></div>
+          <div class="kpi-num" id="kpi-rate">—</div>
+          <div class="kpi-label">Match Success Rate</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Charts row -->
+    <div class="row g-3 mb-4">
+      <div class="col-lg-8">
+        <div class="sra-card p-4 h-100">
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <h2 class="card-heading">Needs by Category</h2>
+            <select class="form-select form-select-sm w-auto" id="chart-filter" onchange="renderCategoryChart()">
+              <option value="bar">Bar</option>
+              <option value="doughnut">Doughnut</option>
+            </select>
+          </div>
+          <canvas id="category-chart" height="220"></canvas>
+        </div>
+      </div>
+      <div class="col-lg-4">
+        <div class="sra-card p-4 h-100">
+          <h2 class="card-heading mb-3">Status Distribution</h2>
+          <canvas id="status-chart" height="220"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <!-- Needs table -->
+    <div class="sra-card p-4 mb-4">
+      <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+        <h2 class="card-heading mb-0">Priority Queue</h2>
+        <div class="d-flex gap-2">
+          <select class="form-select form-select-sm" id="needs-filter" onchange="loadNeeds()">
+            <option value="open">Open</option>
+            <option value="assigned">Assigned</option>
+            <option value="completed">Completed</option>
+          </select>
+          <button class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#needModal">
+            <i class="bi bi-plus-circle me-1"></i>Add Need
+          </button>
+        </div>
+      </div>
+      <div class="table-responsive">
+        <table class="table table-hover align-middle sra-table">
+          <thead>
+            <tr>
+              <th>Category</th>
+              <th>Description</th>
+              <th>Zone</th>
+              <th>Urgency</th>
+              <th>Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="needs-tbody">
+            <tr><td colspan="6" class="text-center py-4 text-muted"><div class="spinner-border spinner-border-sm me-2"></div>Loading…</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Dead letters -->
+    <div class="sra-card p-4">
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2 class="card-heading mb-0">Failed Ingestions <span class="badge bg-danger" id="dl-badge" style="display:none">0</span></h2>
+        <button class="btn btn-sm btn-outline-secondary" onclick="loadDeadLetters()"><i class="bi bi-arrow-clockwise"></i></button>
+      </div>
+      <div id="dead-letters-list"><p class="text-muted small">No failed ingestions.</p></div>
+    </div>
+  </div>
+</div>
+
+<!-- Upload Modal -->
+<div class="modal fade" id="uploadModal" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title"><i class="bi bi-upload me-2 text-primary"></i>Upload Field Data</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <div id="upload-alert" class="alert d-none"></div>
+        <div class="upload-dropzone" id="upload-dropzone" onclick="document.getElementById('upload-file').click()">
+          <i class="bi bi-cloud-upload fs-1 text-primary d-block mb-2"></i>
+          <p class="mb-1 fw-medium">Click or drag to upload</p>
+          <p class="text-muted small mb-0">CSV, Excel, PDF, or Images (max 16MB)</p>
+          <p class="text-muted small mt-2" id="file-name-display"></p>
+        </div>
+        <input type="file" id="upload-file" class="d-none" accept=".csv,.xlsx,.pdf,.png,.jpg,.jpeg" onchange="previewFile(this)"/>
+        <div class="progress mt-3 d-none" id="upload-progress">
+          <div class="progress-bar progress-bar-striped progress-bar-animated" style="width:100%">Processing…</div>
+        </div>
+        <div id="pipeline-status" class="mt-3"></div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+        <button class="btn btn-primary" id="upload-btn" onclick="uploadFile()">
+          <i class="bi bi-upload me-1"></i>Upload & Process
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Match Modal -->
+<div class="modal fade" id="matchModal" tabindex="-1">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title"><i class="bi bi-people me-2 text-primary"></i>Top Volunteer Matches</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body" id="match-results">
+        <div class="text-center py-4"><div class="spinner-border text-primary"></div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Add Need Modal -->
+<div class="modal fade" id="needModal" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title"><i class="bi bi-plus-circle me-2 text-primary"></i>Submit Need</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <div id="need-alert" class="alert d-none"></div>
+        <div class="mb-3">
+          <label class="form-label fw-medium">Category</label>
+          <select class="form-select" id="need-category">
+            <option>Medical</option><option>Food</option><option>Shelter</option>
+            <option>Education</option><option>Mental Health</option><option>Construction</option><option>Other</option>
+          </select>
+        </div>
+        <div class="mb-3">
+          <label class="form-label fw-medium">Description</label>
+          <textarea class="form-control" id="need-desc" rows="3" placeholder="Describe the community need…"></textarea>
+        </div>
+        <div class="row g-3">
+          <div class="col-6">
+            <label class="form-label fw-medium">Severity (1–10)</label>
+            <input type="range" class="form-range" id="need-severity" min="1" max="10" value="5"
+              oninput="document.getElementById('sev-val').textContent=this.value"/>
+            <small class="text-muted">Value: <span id="sev-val">5</span></small>
+          </div>
+          <div class="col-6">
+            <label class="form-label fw-medium">Volunteers Needed</label>
+            <input type="number" class="form-control" id="need-vols" value="1" min="1"/>
+          </div>
+        </div>
+        <div class="row g-3 mt-1">
+          <div class="col-6">
+            <label class="form-label fw-medium">Location</label>
+            <input type="text" class="form-control" id="need-loc" placeholder="Address"/>
+          </div>
+          <div class="col-6">
+            <label class="form-label fw-medium">Zone</label>
+            <input type="text" class="form-control" id="need-zone" placeholder="e.g. North"/>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+        <button class="btn btn-primary" onclick="submitNeed()">Submit Need</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="{{ url_for('static', filename='js/dashboard.js') }}"></script>
+{% endblock %}

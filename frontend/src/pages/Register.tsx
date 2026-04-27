@@ -64,7 +64,7 @@ export default function Register() {
         localStorage.setItem("sra_user_id", String(data.user_id));
         if (data.role === "admin") navigate("/dashboard");
         else if (data.role === "volunteer") navigate("/volunteer");
-        else navigate("/");
+        else navigate("/user");
       } else {
         setError(data.message || "Registration failed. Please try again.");
       }
@@ -230,6 +230,12 @@ export default function Register() {
           <div className="text-center">
             <button onClick={() => navigate("/login")} className="inline-flex items-center gap-2 text-sra-primary font-semibold text-sm hover:text-blue-700 bg-transparent border-0 cursor-pointer transition-colors">
               <i className="bi bi-box-arrow-in-right"></i> Sign in instead
+            </button>
+          </div>
+
+          <div className="text-center mt-3">
+            <button onClick={() => navigate("/register/admin")} className="inline-flex items-center gap-2 text-sra-muted text-xs hover:text-sra-dark bg-transparent border-0 cursor-pointer transition-colors">
+              <i className="bi bi-building"></i> Registering an NGO? Apply for admin access
             </button>
           </div>
         </div>

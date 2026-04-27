@@ -1,0 +1,11 @@
+Survey_ID,Village_Name,Household_Head,Family_Size,Damage_Severity,House_Type,Livestock_Lost,Agricultural_Land_Affected_Acres,Immediate_Needs,Relocation_Required
+S001,Gosaba,Animesh Mondal,5,Total,Kutcha,2,1.5,"Shelter, Food",Yes
+S002,Patharpratima,Bimala Das,4,Partial,Semi-Pucca,0,0.5,Roofing material,No
+S003,Namkhana,Sukumar Gayen,6,Total,Kutcha,4,2.0,"Shelter, Water",Yes
+S004,Sagar Island,Sabita Halder,3,Structural,Pucca,1,0.2,Repairs,No
+S005,Basanti,Kartick Sardar,7,Total,Kutcha,3,3.0,Full aid,Yes
+S006,Kultali,Ruma Parvin,5,Partial,Kutcha,2,1.2,"Food, Meds",No
+S007,Canning,Dilip Baidya,4,Total,Kutcha,5,2.5,Shelter,Yes
+S008,Hingalganj,Arati Maity,6,Total,Kutcha,3,1.8,"Food, Water",Yes
+S009,Sandeshkhali,Bikash Mistri,5,Structural,Semi-Pucca,0,0.8,Repairs,No
+S010,Minakhan,Lata Patra,3,Partial,Kutcha,1,0.4,Meds,No

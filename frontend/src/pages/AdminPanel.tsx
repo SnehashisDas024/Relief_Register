@@ -13,6 +13,12 @@ interface DeadLetter {
 
 const PIPELINE_STAGES = ["extracted", "cleaned", "classified", "scored", "matched", "notified"];
 
+interface NgoReg {
+  id: number; user_id: number; user_name: string; user_email: string;
+  ngo_name: string; ngo_head_id: string; proof_url: string; proof_filename: string;
+  status: string; rejection_reason?: string; created_at: string;
+}
+
 export default function AdminPanel() {
   const [users, setUsers] = useState<User[]>([]);
   const [deadLetters, setDeadLetters] = useState<DeadLetter[]>([]);
@@ -22,6 +28,10 @@ export default function AdminPanel() {
   const [pipelineResult, setPipelineResult] = useState<any>(null);
   const [expandedDL, setExpandedDL] = useState<number | null>(null);
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [ngoRegs, setNgoRegs] = useState<NgoReg[]>([]);
+  const [ngoFilter, setNgoFilter] = useState<"pending"|"all">("pending");
+  const [rejectingId, setRejectingId] = useState<number | null>(null);
+  const [rejectReason, setRejectReason] = useState("");
 
   const categoryWeights = [
     { category: "Medical", severity: 0.35, frequency: 0.25, gap: 0.40 },
@@ -35,9 +45,29 @@ export default function AdminPanel() {
   useEffect(() => { loadData(); }, []);
 
   const loadData = async () => {
-    const [usersData, dlData] = await Promise.all([apiGet("/api/admin/users"), apiGet("/api/admin/dead-letters")]);
+    const [usersData, dlData, ngoData] = await Promise.all([
+      apiGet("/api/admin/users"),
+      apiGet("/api/admin/dead-letters"),
+      apiGet("/api/auth/admin-registrations?status=all"),
+    ]);
     if (usersData?.users) setUsers(usersData.users);
     if (dlData?.items) setDeadLetters(dlData.items);
+    if (ngoData?.registrations) setNgoRegs(ngoData.registrations);
+  };
+
+  const reviewNgo = async (id: number, action: "approve" | "reject") => {
+    const body: any = { action };
+    if (action === "reject") body.reason = rejectReason;
+    const { apiPatch: ap } = await import("../utils/api");
+    const res = await fetch(`/api/auth/admin-registrations/${id}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json", Authorization: `Bearer ${localStorage.getItem("sra_token")}` },
+      body: JSON.stringify(body),
+    });
+    if (res.ok) {
+      setNgoRegs(prev => prev.map(r => r.id === id ? { ...r, status: action === "approve" ? "approved" : "rejected" } : r));
+      setRejectingId(null); setRejectReason("");
+    }
   };
 
   const toggleUserActive = async (userId: number, currentActive: boolean) => {
@@ -101,6 +131,106 @@ export default function AdminPanel() {
         <button onClick={() => setSidebarOpen(!sidebarOpen)} className="lg:hidden btn btn-sm btn-outline-secondary mb-3 rounded-xl">
           <i className="bi bi-list"></i>Menu
         </button>
+
+
+        {/* ── Section 0: NGO Admin Registrations ── */}
+        {(() => {
+          const displayed = ngoFilter === "pending" ? ngoRegs.filter(r => r.status === "pending") : ngoRegs;
+          const pendingCount = ngoRegs.filter(r => r.status === "pending").length;
+          return (
+            <div className="sra-card p-6 mb-6">
+              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-5">
+                <h2 className="text-lg font-bold text-sra-dark flex items-center gap-2">
+                  <span className="w-9 h-9 rounded-xl bg-violet-100 text-violet-600 flex items-center justify-center text-sm"><i className="bi bi-building-check"></i></span>
+                  NGO Admin Applications
+                  {pendingCount > 0 && <span className="ml-2 text-xs px-2 py-0.5 rounded-full bg-red-100 text-red-600 font-semibold">{pendingCount} pending</span>}
+                </h2>
+                <div className="flex gap-2 mt-2 sm:mt-0">
+                  {(["pending","all"] as const).map(f => (
+                    <button key={f} onClick={() => setNgoFilter(f)}
+                      className={`btn btn-sm rounded-xl px-3 ${ngoFilter === f ? "btn-primary" : "btn-outline-secondary"}`}>
+                      {f.charAt(0).toUpperCase() + f.slice(1)}
+                    </button>
+                  ))}
+                </div>
+              </div>
+              {displayed.length === 0 ? (
+                <div className="text-center py-8 text-sra-muted">
+                  <i className="bi bi-building text-3xl d-block mb-2 opacity-30"></i>
+                  No {ngoFilter === "pending" ? "pending" : ""} applications
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  {displayed.map(reg => (
+                    <div key={reg.id} className="border border-sra-border rounded-2xl p-4" style={{background:"var(--sra-bg-input)"}}>
+                      <div className="flex flex-col sm:flex-row sm:items-start gap-3">
+                        {/* Info */}
+                        <div className="flex-1 min-w-0">
+                          <div className="flex flex-wrap items-center gap-2 mb-1">
+                            <span className="font-semibold text-sra-dark text-sm">{reg.ngo_name}</span>
+                            <span className={`text-[11px] px-2 py-0.5 rounded-full font-semibold ${
+                              reg.status === "pending" ? "bg-amber-100 text-amber-700" :
+                              reg.status === "approved" ? "bg-green-100 text-green-700" :
+                              "bg-red-100 text-red-700"}`}>{reg.status}</span>
+                          </div>
+                          <div className="text-xs text-sra-muted mb-1">
+                            <i className="bi bi-person me-1"></i>{reg.user_name} — {reg.user_email}
+                          </div>
+                          <div className="text-xs text-sra-muted mb-1">
+                            <i className="bi bi-fingerprint me-1"></i>NGO ID: <span className="font-mono text-sra-dark">{reg.ngo_head_id}</span>
+                          </div>
+                          <div className="text-xs text-sra-muted">
+                            <i className="bi bi-calendar me-1"></i>Applied {formatDate(reg.created_at)}
+                          </div>
+                          {reg.rejection_reason && (
+                            <div className="mt-2 text-xs text-red-500"><i className="bi bi-x-circle me-1"></i>{reg.rejection_reason}</div>
+                          )}
+                        </div>
+                        {/* Proof link */}
+                        <div className="flex-shrink-0">
+                          <a href={reg.proof_url} target="_blank" rel="noopener noreferrer"
+                            className="btn btn-sm btn-outline-secondary rounded-xl text-xs flex items-center gap-1">
+                            <i className="bi bi-file-earmark-text"></i>
+                            View Proof
+                          </a>
+                        </div>
+                        {/* Actions */}
+                        {reg.status === "pending" && (
+                          <div className="flex gap-2 flex-shrink-0">
+                            <button onClick={() => reviewNgo(reg.id, "approve")}
+                              className="btn btn-sm rounded-xl text-xs flex items-center gap-1"
+                              style={{background:"#10B981",color:"white",border:"none"}}>
+                              <i className="bi bi-check-lg"></i>Approve
+                            </button>
+                            <button onClick={() => setRejectingId(reg.id)}
+                              className="btn btn-sm rounded-xl text-xs flex items-center gap-1"
+                              style={{background:"#EF4444",color:"white",border:"none"}}>
+                              <i className="bi bi-x-lg"></i>Reject
+                            </button>
+                          </div>
+                        )}
+                      </div>
+                      {/* Reject reason input */}
+                      {rejectingId === reg.id && (
+                        <div className="mt-3 flex gap-2">
+                          <input className="sra-input flex-1 text-sm"
+                            placeholder="Reason for rejection (optional)..."
+                            value={rejectReason} onChange={e => setRejectReason(e.target.value)} />
+                          <button onClick={() => reviewNgo(reg.id, "reject")}
+                            className="btn btn-sm rounded-xl" style={{background:"#EF4444",color:"white",border:"none"}}>
+                            Confirm Reject
+                          </button>
+                          <button onClick={() => { setRejectingId(null); setRejectReason(""); }}
+                            className="btn btn-sm btn-outline-secondary rounded-xl">Cancel</button>
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          );
+        })()}
 
         {/* ── Section 1: User Management ── */}
         <div className="sra-card p-6 mb-6">

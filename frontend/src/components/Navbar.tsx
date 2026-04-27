@@ -52,11 +52,13 @@ export default function Navbar() {
     ];
     if (role === "volunteer") return [
       { to: "/volunteer", icon: "bi-list-task", label: "My Tasks" },
-      { to: "/volunteer", icon: "bi-upload", label: "Upload Data" },
+      { to: "/volunteer/map", icon: "bi-map", label: "Affected Areas" },
+      { to: "/chat/general", icon: "bi-chat-dots", label: "Chat" },
     ];
     if (role === "user") return [
-      { to: "/", icon: "bi-plus-circle", label: "Submit Need" },
-      { to: "/", icon: "bi-list-check", label: "My Needs" },
+      { to: "/user", icon: "bi-speedometer2", label: "Dashboard" },
+      { to: "/volunteer/map", icon: "bi-map", label: "Affected Areas" },
+      { to: "/chat/general", icon: "bi-chat-dots", label: "Chat" },
     ];
     return [];
   };

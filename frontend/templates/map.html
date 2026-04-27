@@ -1,0 +1,81 @@
+{% extends "base.html" %}
+{% block title %}Live Map — SRA{% endblock %}
+{% block extra_css %}<link href="{{ url_for('static', filename='css/map.css') }}" rel="stylesheet"/>{% endblock %}
+
+{% block content %}
+<div class="map-layout">
+  <!-- Sidebar -->
+  <aside class="map-sidebar">
+    <div class="map-sidebar-header">
+      <h2 class="fs-6 fw-bold mb-0">Live Map</h2>
+      <a href="/dashboard" class="btn btn-sm btn-outline-secondary">
+        <i class="bi bi-arrow-left me-1"></i>Back
+      </a>
+    </div>
+
+    <!-- Filters -->
+    <div class="map-filters p-3 border-bottom">
+      <p class="small fw-medium text-muted mb-2 text-uppercase">Filter</p>
+      <div class="mb-2">
+        <label class="form-label small">Category</label>
+        <select class="form-select form-select-sm" id="cat-filter" onchange="applyFilters()">
+          <option value="">All Categories</option>
+          <option>Medical</option><option>Food</option><option>Shelter</option>
+          <option>Education</option><option>Mental Health</option><option>Construction</option><option>Other</option>
+        </select>
+      </div>
+      <div class="mb-2">
+        <label class="form-label small">Status</label>
+        <select class="form-select form-select-sm" id="status-filter" onchange="applyFilters()">
+          <option value="">All Statuses</option>
+          <option value="open">Open</option>
+          <option value="assigned">Assigned</option>
+          <option value="completed">Completed</option>
+        </select>
+      </div>
+      <div class="form-check form-switch mt-2">
+        <input class="form-check-input" type="checkbox" id="show-volunteers" checked onchange="toggleVolunteers()"/>
+        <label class="form-check-label small" for="show-volunteers">Show Volunteers</label>
+      </div>
+    </div>
+
+    <!-- Legend -->
+    <div class="map-legend p-3 border-bottom">
+      <p class="small fw-medium text-muted mb-2 text-uppercase">Legend</p>
+      <div class="d-flex align-items-center gap-2 mb-1"><div class="legend-dot" style="background:#EF4444"></div><small>Open Need</small></div>
+      <div class="d-flex align-items-center gap-2 mb-1"><div class="legend-dot" style="background:#F59E0B"></div><small>Assigned Need</small></div>
+      <div class="d-flex align-items-center gap-2 mb-1"><div class="legend-dot" style="background:#10B981"></div><small>Completed Need</small></div>
+      <div class="d-flex align-items-center gap-2"><div class="legend-dot" style="background:#3B82F6"></div><small>Volunteer</small></div>
+    </div>
+
+    <!-- Needs list -->
+    <div class="map-list" id="map-list">
+      <p class="text-muted small p-3">Loading needs…</p>
+    </div>
+  </aside>
+
+  <!-- Map container -->
+  <div id="map-container">
+    <div id="leaflet-map"></div>
+    <!-- Map controls -->
+    <div class="map-controls">
+      <button class="map-ctrl-btn" onclick="mapObj.locate({setView:true,maxZoom:13})" title="My Location">
+        <i class="bi bi-crosshair"></i>
+      </button>
+      <button class="map-ctrl-btn" onclick="refreshMap()" title="Refresh">
+        <i class="bi bi-arrow-clockwise"></i>
+      </button>
+      <button class="map-ctrl-btn" onclick="mapObj.setView([22.5726, 88.3639], 11)" title="Reset View">
+        <i class="bi bi-house"></i>
+      </button>
+    </div>
+    <!-- Live indicator -->
+    <div class="live-indicator">
+      <span class="live-dot"></span>
+      <span class="small fw-medium">LIVE</span>
+    </div>
+  </div>
+</div>
+
+<script src="{{ url_for('static', filename='js/map.js') }}"></script>
+{% endblock %}

@@ -15,7 +15,7 @@ export default function Login() {
       const role = SRA.role;
       if (role === "admin") navigate("/dashboard");
       else if (role === "volunteer") navigate("/volunteer");
-      else navigate("/");
+      else navigate("/user");
     }
   }, [navigate]);
 
@@ -33,7 +33,7 @@ export default function Login() {
         localStorage.setItem("sra_user_id", String(data.user_id));
         if (data.role === "admin") navigate("/dashboard");
         else if (data.role === "volunteer") navigate("/volunteer");
-        else navigate("/");
+        else navigate("/user");
       } else {
         setError(data.message || "Invalid credentials. Please try again.");
       }

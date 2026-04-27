@@ -1,0 +1,163 @@
+{% extends "base.html" %}
+{% block title %}Smart Resource Allocation — Community Impact{% endblock %}
+{% block extra_css %}<link href="{{ url_for('static', filename='css/landing.css') }}" rel="stylesheet"/>{% endblock %}
+
+{% block content %}
+<!-- Hero -->
+<section class="hero-section text-white text-center">
+  <div class="hero-pattern"></div>
+  <div class="hero-inner position-relative">
+    <h1 class="hero-title fade-in-up">
+      Community Data.<br>Real Action.<br><span style="color:#10B981">Real Impact.</span>
+    </h1>
+    <p class="hero-sub fade-in-up" style="animation-delay:.2s">
+      Connecting NGOs with the right volunteers for the most urgent community needs — powered by AI.
+    </p>
+    <div class="hero-btns fade-in-up" style="animation-delay:.4s">
+      <a href="/register" class="btn btn-light fw-semibold px-4 py-3 rounded-3 me-3 shadow">
+        <i class="bi bi-rocket-takeoff me-2"></i>Get Started
+      </a>
+      <a href="#features" class="btn btn-outline-light fw-semibold px-4 py-3 rounded-3">
+        <i class="bi bi-arrow-down-circle me-2"></i>Learn More
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- Stats bar -->
+<section class="bg-white border-bottom py-5" id="stats-bar">
+  <div class="container">
+    <div class="row text-center g-4">
+      {% for stat in [
+        {"count":2400,"suffix":"+","label":"Needs Addressed","icon":"bi-check-circle"},
+        {"count":580,"suffix":"+","label":"Volunteers","icon":"bi-people"},
+        {"count":94,"suffix":"%","label":"Match Success Rate","icon":"bi-bullseye"},
+        {"count":12,"suffix":"","label":"NGO Partners","icon":"bi-building"}
+      ] %}
+      <div class="col-6 col-md-3 fade-in-up">
+        <i class="bi {{ stat.icon }} fs-3 text-primary d-block mb-2"></i>
+        <div class="stat-num fs-2 fw-bold" data-count="{{ stat.count }}" data-suffix="{{ stat.suffix }}">0{{ stat.suffix }}</div>
+        <div class="text-muted small">{{ stat.label }}</div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+<!-- Features -->
+<section class="py-5 bg-light" id="features">
+  <div class="container">
+    <h2 class="text-center fw-bold mb-2">How It Works</h2>
+    <p class="text-center text-muted mb-5">Our platform uses AI to match community needs with the best-suited volunteers.</p>
+    <div class="row g-4">
+      {% for f in [
+        {"icon":"bi-upload","title":"Smart Data Ingestion","desc":"Upload CSV, images, or PDFs. Our AI extracts, cleans, and classifies community needs automatically."},
+        {"icon":"bi-graph-up-arrow","title":"Priority Intelligence","desc":"Every need is scored by severity, urgency, and volunteer gap. The most critical needs always surface first."},
+        {"icon":"bi-geo-alt","title":"Location-Aware Matching","desc":"Volunteers are matched by skills AND proximity. High urgency means nearby. Low urgency means best fit."}
+      ] %}
+      <div class="col-md-4">
+        <div class="sra-card feature-card p-5 text-center h-100">
+          <div class="feature-icon-wrap mx-auto mb-4">
+            <i class="bi {{ f.icon }} fs-1"></i>
+          </div>
+          <h3 class="h5 fw-semibold mb-3">{{ f.title }}</h3>
+          <p class="text-muted">{{ f.desc }}</p>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+<!-- Timeline -->
+<section class="py-5 bg-white">
+  <div class="container">
+    <h2 class="text-center fw-bold mb-5">Step by Step</h2>
+    <div class="timeline-row d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-3">
+      {% for step in ["Upload Data","AI Processes","Needs Prioritized","Volunteer Matched","Task Assigned","Community Helped"] %}
+      <div class="timeline-step text-center flex-1 position-relative">
+        <div class="timeline-circle">{{ loop.index }}</div>
+        <span class="small fw-medium d-block mt-2">{{ step }}</span>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+<!-- Roles -->
+<section class="py-5 bg-light">
+  <div class="container">
+    <h2 class="text-center fw-bold mb-5">Join as...</h2>
+    <div class="row g-4">
+      {% for role in [
+        {"icon":"bi-shield-check","title":"Admin","color":"bg-purple-light text-purple",
+         "bullets":["Upload CSV / image / PDF field data","View analytics dashboard with charts","Review AI matches and assign tasks"]},
+        {"icon":"bi-person-badge","title":"Volunteer","color":"bg-green-light text-green",
+         "bullets":["Accept or decline assigned tasks","Enable live GPS tracking on task","Rate task completion and view history"]},
+        {"icon":"bi-people","title":"Community Member","color":"bg-blue-light text-primary",
+         "bullets":["Submit community needs via form","Track status of submitted needs","Chat with assigned volunteer"]}
+      ] %}
+      <div class="col-md-4">
+        <div class="sra-card p-4 h-100">
+          <div class="role-icon {{ role.color }} mb-3">
+            <i class="bi {{ role.icon }} fs-2"></i>
+          </div>
+          <h3 class="h5 fw-semibold mb-3">{{ role.title }}</h3>
+          <ul class="list-unstyled mb-4">
+            {% for b in role.bullets %}
+            <li class="d-flex gap-2 text-muted small mb-2">
+              <i class="bi bi-check2 text-success mt-1 flex-shrink-0"></i>{{ b }}
+            </li>
+            {% endfor %}
+          </ul>
+          <a href="/register" class="text-primary fw-semibold small text-decoration-none">
+            Register as {{ role.title }} <i class="bi bi-arrow-right"></i>
+          </a>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+<!-- Footer -->
+<footer class="py-5" style="background:#1E293B;color:white">
+  <div class="container">
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-center gap-4">
+      <div>
+        <div class="d-flex align-items-center gap-2 mb-2">
+          <i class="bi bi-geo-alt-fill text-primary fs-5"></i>
+          <span class="fw-bold fs-5">Smart Resource Allocation</span>
+        </div>
+        <p class="text-secondary small mb-0">Bridging the gap between community needs and volunteer action.</p>
+      </div>
+      <div class="text-center text-md-end">
+        <p class="small text-secondary mb-1">H2S × Google for Developers</p>
+        <div class="d-flex gap-3 justify-content-center justify-content-md-end">
+          <a href="#" class="text-secondary text-decoration-none small">About</a>
+          <a href="#" class="text-secondary text-decoration-none small">Privacy</a>
+          <a href="#" class="text-secondary text-decoration-none small">Contact</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<script>
+// Counter animation
+document.addEventListener("DOMContentLoaded", () => {
+  const obs = new IntersectionObserver(entries => {
+    if (entries[0].isIntersecting) {
+      document.querySelectorAll("[data-count]").forEach(el => {
+        const target = +el.dataset.count, suffix = el.dataset.suffix || "";
+        let cur = 0; const step = Math.ceil(target/60);
+        const t = setInterval(() => { cur = Math.min(cur+step, target); el.textContent = cur.toLocaleString()+suffix; if(cur>=target) clearInterval(t); }, 16);
+      });
+      obs.disconnect();
+    }
+  }, {threshold:0.3});
+  const bar = document.getElementById("stats-bar");
+  if (bar) obs.observe(bar);
+});
+</script>
+{% endblock %}

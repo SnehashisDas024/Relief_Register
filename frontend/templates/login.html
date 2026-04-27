@@ -1,0 +1,154 @@
+{% extends "base.html" %}
+{% block title %}Login — SRA{% endblock %}
+{% block extra_css %}<link href="{{ url_for('static', filename='css/auth.css') }}" rel="stylesheet"/>{% endblock %}
+
+{% block content %}
+<div class="auth-page">
+  <div class="auth-left d-none d-lg-flex">
+    <div class="auth-left-inner">
+      <a href="/" class="auth-brand">
+        <i class="bi bi-geo-alt-fill"></i>
+        <span>Smart Resource Allocation</span>
+      </a>
+      <div class="auth-illustration">
+        <div class="illus-circle illus-c1"></div>
+        <div class="illus-circle illus-c2"></div>
+        <div class="illus-circle illus-c3"></div>
+        <i class="bi bi-people-fill illus-icon"></i>
+      </div>
+      <h2 class="text-white fw-bold fs-2 mb-3">Connecting volunteers<br>with urgent needs</h2>
+      <p class="text-white-50">AI-powered matching that puts the right person in the right place at the right time.</p>
+    </div>
+  </div>
+
+  <div class="auth-right">
+    <div class="auth-form-card">
+      <div class="d-lg-none text-center mb-4">
+        <a href="/" class="auth-brand-sm">
+          <i class="bi bi-geo-alt-fill text-primary"></i>
+          <span class="fw-bold">SRA</span>
+        </a>
+      </div>
+
+      <h1 class="fs-3 fw-bold mb-1">Welcome back</h1>
+      <p class="text-muted mb-4">Sign in to your account</p>
+
+      <div id="alert-box" class="alert d-none" role="alert"></div>
+
+      <form id="login-form" novalidate>
+        <div class="mb-3">
+          <label class="form-label fw-medium">Email address</label>
+          <div class="input-group">
+            <span class="input-group-text"><i class="bi bi-envelope"></i></span>
+            <input type="email" class="form-control" id="email" placeholder="you@example.com" required autocomplete="email"/>
+          </div>
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label fw-medium d-flex justify-content-between">
+            Password
+            <a href="#" class="text-primary small text-decoration-none">Forgot password?</a>
+          </label>
+          <div class="input-group">
+            <span class="input-group-text"><i class="bi bi-lock"></i></span>
+            <input type="password" class="form-control" id="password" placeholder="••••••••" required autocomplete="current-password"/>
+            <button class="input-group-text btn" type="button" id="pw-toggle" tabindex="-1">
+              <i class="bi bi-eye" id="pw-icon"></i>
+            </button>
+          </div>
+        </div>
+
+        <div class="mb-4 form-check">
+          <input type="checkbox" class="form-check-input" id="remember"/>
+          <label class="form-check-label text-muted" for="remember">Remember me for 30 days</label>
+        </div>
+
+        <button type="submit" class="btn btn-primary w-100 py-3 fw-semibold" id="login-btn">
+          <span class="btn-text"><i class="bi bi-box-arrow-in-right me-2"></i>Sign In</span>
+          <span class="btn-spinner spinner-border spinner-border-sm d-none"></span>
+        </button>
+      </form>
+
+      <p class="text-center mt-4 text-muted">
+        Don't have an account?
+        <a href="/register" class="text-primary fw-medium text-decoration-none">Create one</a>
+      </p>
+
+      <!-- Demo credentials -->
+      <div class="demo-creds mt-4">
+        <div class="demo-creds-header">Demo Credentials</div>
+        <div class="row g-2 mt-1">
+          <div class="col-4">
+            <button class="demo-btn w-100" onclick="fillDemo('admin@sra.org','Admin1234!')">
+              <i class="bi bi-shield-check d-block mb-1 text-primary"></i>Admin
+            </button>
+          </div>
+          <div class="col-4">
+            <button class="demo-btn w-100" onclick="fillDemo('volunteer@sra.org','Admin1234!')">
+              <i class="bi bi-person-badge d-block mb-1 text-success"></i>Volunteer
+            </button>
+          </div>
+          <div class="col-4">
+            <button class="demo-btn w-100" onclick="fillDemo('user@sra.org','Admin1234!')">
+              <i class="bi bi-people d-block mb-1 text-info"></i>User
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="{{ url_for('static', filename='js/auth.js') }}"></script>
+<script>
+function fillDemo(email, pass) {
+  document.getElementById("email").value = email;
+  document.getElementById("password").value = pass;
+}
+document.getElementById("login-form").addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const btn = document.getElementById("login-btn");
+  const alertBox = document.getElementById("alert-box");
+  btn.querySelector(".btn-text").classList.add("d-none");
+  btn.querySelector(".btn-spinner").classList.remove("d-none");
+  btn.disabled = true;
+  alertBox.className = "alert d-none";
+  try {
+    const res = await fetch("/api/auth/login", {
+      method: "POST",
+      headers: {"Content-Type":"application/json"},
+      body: JSON.stringify({
+        email: document.getElementById("email").value.trim(),
+        password: document.getElementById("password").value
+      })
+    });
+    const data = await res.json();
+    if (res.ok) {
+      localStorage.setItem("sra_token", data.token);
+      localStorage.setItem("sra_role", data.role);
+      localStorage.setItem("sra_name", data.name);
+      localStorage.setItem("sra_user_id", data.user_id);
+      if (data.role === "admin") window.location.href = "/dashboard";
+      else if (data.role === "volunteer") window.location.href = "/volunteer";
+      else window.location.href = "/";
+    } else {
+      alertBox.className = "alert alert-danger";
+      alertBox.textContent = data.message || "Login failed";
+    }
+  } catch (err) {
+    alertBox.className = "alert alert-danger";
+    alertBox.textContent = "Network error — please try again";
+  } finally {
+    btn.querySelector(".btn-text").classList.remove("d-none");
+    btn.querySelector(".btn-spinner").classList.add("d-none");
+    btn.disabled = false;
+  }
+});
+document.getElementById("pw-toggle").addEventListener("click", () => {
+  const pw = document.getElementById("password");
+  const ic = document.getElementById("pw-icon");
+  if (pw.type === "password") { pw.type = "text"; ic.className = "bi bi-eye-slash"; }
+  else { pw.type = "password"; ic.className = "bi bi-eye"; }
+});
+</script>
+{% endblock %}

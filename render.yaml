@@ -1,0 +1,136 @@
+# render.yaml — Render platform deployment configuration.
+# Defines all four services: web, worker, beat, and static frontend.
+# Render PostgreSQL and Redis are added as add-ons in the dashboard.
+
+services:
+
+  # ── Flask web server ──────────────────────────────────────────────
+  - type: web
+    name: sra-web
+    runtime: python
+    rootDir: backend
+    buildCommand: |
+      pip install -r requirements.txt &&
+      python -m spacy download en_core_web_sm &&
+      flask db upgrade
+    startCommand: gunicorn --worker-class eventlet -w 1 run:app
+    envVars:
+      - key: FLASK_ENV
+        value: production
+      - key: SECRET_KEY
+        generateValue: true
+      - key: JWT_SECRET_KEY
+        generateValue: true
+      - key: DATABASE_URL
+        fromDatabase:
+          name: sra-postgres
+          property: connectionString
+      - key: REDIS_URL
+        fromService:
+          name: sra-redis
+          type: redis
+          property: connectionString
+      - key: CELERY_BROKER_URL
+        fromService:
+          name: sra-redis
+          type: redis
+          property: connectionString
+      - key: CELERY_RESULT_URL
+        fromService:
+          name: sra-redis
+          type: redis
+          property: connectionString
+      - key: GEMINI_API_KEY
+        sync: false
+      - key: CLOUDINARY_URL
+        sync: false
+      - key: TWILIO_SID
+        sync: false
+      - key: TWILIO_TOKEN
+        sync: false
+      - key: TWILIO_PHONE
+        sync: false
+      - key: MAIL_SERVER
+        value: smtp.gmail.com
+      - key: MAIL_PORT
+        value: "587"
+      - key: MAIL_USERNAME
+        sync: false
+      - key: MAIL_PASSWORD
+        sync: false
+
+  # ── Celery worker ─────────────────────────────────────────────────
+  - type: worker
+    name: sra-worker
+    runtime: python
+    rootDir: backend
+    buildCommand: pip install -r requirements.txt && python -m spacy download en_core_web_sm
+    startCommand: celery -A celery_worker.celery worker --loglevel=info
+    envVars:
+      - key: FLASK_ENV
+        value: production
+      - key: DATABASE_URL
+        fromDatabase:
+          name: sra-postgres
+          property: connectionString
+      - key: REDIS_URL
+        fromService:
+          name: sra-redis
+          type: redis
+          property: connectionString
+      - key: CELERY_BROKER_URL
+        fromService:
+          name: sra-redis
+          type: redis
+          property: connectionString
+      - key: CELERY_RESULT_URL
+        fromService:
+          name: sra-redis
+          type: redis
+          property: connectionString
+      - key: GEMINI_API_KEY
+        sync: false
+      - key: CLOUDINARY_URL
+        sync: false
+      - key: TWILIO_SID
+        sync: false
+      - key: TWILIO_TOKEN
+        sync: false
+      - key: TWILIO_PHONE
+        sync: false
+      - key: MAIL_USERNAME
+        sync: false
+      - key: MAIL_PASSWORD
+        sync: false
+
+  # ── Celery beat (periodic tasks) ──────────────────────────────────
+  - type: worker
+    name: sra-beat
+    runtime: python
+    rootDir: backend
+    buildCommand: pip install -r requirements.txt
+    startCommand: celery -A celery_worker.celery beat --loglevel=info
+    envVars:
+      - key: FLASK_ENV
+        value: production
+      - key: REDIS_URL
+        fromService:
+          name: sra-redis
+          type: redis
+          property: connectionString
+      - key: CELERY_BROKER_URL
+        fromService:
+          name: sra-redis
+          type: redis
+          property: connectionString
+      - key: CELERY_RESULT_URL
+        fromService:
+          name: sra-redis
+          type: redis
+          property: connectionString
+
+databases:
+  - name: sra-postgres
+    databaseName: sra_prod
+    user: sra
+    plan: free
